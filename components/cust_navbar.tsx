@@ -9,6 +9,7 @@ const Cust_navbar = () => {
         <div className='flex justify-center items-center gap-2 m-2'>
             <li className='list-none font-thin hover:underline'>About us</li>
             <li className='list-none font-thin hover:underline'>Contact</li>
+            {/* based on the token update the Navbar */}
             <li className='list-none font-thin hover:underline'>Login</li>
             {/* <li className='list-none bg-red-400 rounded-xl p-1 text-gray-600'>Business Login</li> */}
         </div>

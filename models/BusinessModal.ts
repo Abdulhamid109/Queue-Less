@@ -1,0 +1,40 @@
+import mongoose from "mongoose";
+
+
+const BusinessModal = new mongoose.Schema({
+    BusinessName:{
+        type:String,
+    },
+    BusinessCurrentLocation:{
+        type:String,
+    },
+    BusinessAddress:{
+        type:String
+    },
+    //based on the business categories we can set the business fields for them
+    // like for healthcare ->different (generally fixed times, also we can say to the patients to be there before 10 mins)
+    // for saloons and babershops ->different based on the haircut and beard we can define time / Queue progressiveness
+    // Medical Stores and so on,.....
+    BusinessCategory:{
+        type:String
+    },
+    Country:{
+        type:String
+    },
+    State:{
+        type:String
+    },
+    City:{
+        type:String
+    },
+    pinCode:{
+        type:String
+    },
+    BusinessGSTIN:{
+        type:String
+    },
+    
+});
+
+const business = mongoose.models.business || mongoose.model('business',BusinessModal);
+export default business;

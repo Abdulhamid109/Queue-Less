@@ -8,19 +8,25 @@ const Page = () => {
 
                 <div className="flex flex-col gap-2 mb-6 text-center">
                     <h1 className="text-2xl font-semibold text-gray-800">
-                        Welcome Back
+                        Welcome
                     </h1>
-                    <p className="text-gray-500 text-sm">
-                        You have been missed
-                    </p>
                 </div>
 
                 <form className="flex flex-col gap-4">
+                     <div className="flex flex-col gap-1">
+                        <label className="text-sm text-gray-600">Company Name</label>
+                        <input
+                            type="text"
+                            placeholder="Enter your Company Name"
+                            required
+                            className="p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                        />
+                    </div>
                     <div className="flex flex-col gap-1">
-                        <label className="text-sm text-gray-600">Email</label>
+                        <label className="text-sm text-gray-600">Company Email</label>
                         <input
                             type="email"
-                            placeholder="Enter your email"
+                            placeholder="Enter your company email"
                             required
                             className="p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
                         />
@@ -40,19 +46,12 @@ const Page = () => {
                         type="submit"
                         className="mt-2 w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition duration-200"
                     >
-                        Login
+                        Signup
                     </button>
                 </form>
 
                 <p className="text-center text-sm text-gray-500 mt-6">
-                    Don&apos;t have an account?{" "}
-                    <Link href={"/auth/signin"} className="text-blue-600 cursor-pointer hover:underline">
-                        Sign up
-                    </Link>
-                </p>
-
-                <p className="text-center text-sm text-gray-500 mt-6">
-                    Login as bussiness Owner?{" "}
+                    Already have an bussiness account?{" "}
                     <Link href={"/admin/auth/login"} className="text-blue-600 cursor-pointer hover:underline">
                         Login
                     </Link>

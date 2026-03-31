@@ -16,6 +16,9 @@ const ServiceModal = new mongoose.Schema({
     },
     CustomerLimitPerDay:{
         type:String
+    },
+    ChargesPerService:{
+        type:String
     }
 });
 

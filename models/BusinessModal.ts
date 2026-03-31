@@ -33,7 +33,9 @@ const BusinessModal = new mongoose.Schema({
     BusinessGSTIN:{
         type:String
     },
-    
+    NoOfWorkers:{
+        type:String
+    }
 });
 
 const business = mongoose.models.business || mongoose.model('business',BusinessModal);

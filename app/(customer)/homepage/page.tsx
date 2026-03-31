@@ -10,15 +10,15 @@ const Page = () => {
         </section>
         <section className='grid md:grid-cols-3 grid-cols-1 relative m-[5vh] '>
             
-            {/* lets make an card over here */}
+            
             <div className='bg-amber-200 rounded-md p-2 m-1'>
                 Business - HairStyle
             </div>
             <div className='bg-amber-200 rounded-md p-2 m-1'>
                 Business - Clinics
             </div>
-            <div className='bg-amber-200 rounded-md p-2 m-1'>
-                Business - pharmsis
+            <div className=' rounded-md p-2 m-1'>
+                Business - more business soon
             </div>
         </section>
     </div>

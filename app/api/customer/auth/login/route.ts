@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
         const useravailable = await customer.findOne({email});
         if(!useravailable){
             return NextResponse.json(
-                {error:"Account already exits!"},
+                {error:"Account not found"},
                 {status:401}
             )
         }

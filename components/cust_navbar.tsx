@@ -1,5 +1,5 @@
 "use client"
-import React from 'react'
+import React, { useEffect } from 'react'
 import { getCookie } from 'cookies-next'
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
@@ -8,9 +8,14 @@ import Link from 'next/link';
 const Cust_navbar = () => {
   const session = getCookie('token');
   const router = useRouter();
+  console.log("cookie"+session);
+  // useEffect(()=>{
+  //   console.log("cookie"+session);
+  // },)
 
   const handleLogout = async()=>{
     try {
+      console.log("Token"+session)
       const response = await fetch("/api/customer/auth/logout",{
         method:'GET'
       });
@@ -29,15 +34,20 @@ const Cust_navbar = () => {
     }
   }
   return (
-    <nav className=' p-2 flex justify-between  items-center backdrop-blur-2xl shadow-2xl '>
-        <div className='text-2xl m-2'>
+    <nav className=' p-2 font-sans flex justify-between  items-center backdrop-blur-2xl shadow-2xl '>
+        {session?<Link href={"/homepage"} className='text-2xl m-2'>
             Queue-Less
-        </div>
+        </Link>
+        :<Link href={"/"} className='text-2xl m-2'>
+            Queue-Less
+        </Link>
+        }
         <div className='flex justify-center items-center gap-2 m-2'>
+          <Link href={"/profile"} className='list-none  hover:underline'>Profile</Link>
             <li className='list-none  hover:underline'>About us</li>
             <li className='list-none  hover:underline'>Contact</li>
             {/* based on the token update the Navbar */}
-            {session?<Link href={"/auth/login"} className='list-none  hover:underline'>Login</Link>:<button className='bg-red-500 rounded-md hover:bg-red-600 p-1' onClick={handleLogout}>Logout</button>}
+            {session?<button className='bg-red-500 rounded-md hover:bg-red-600 p-1' onClick={handleLogout}>Logout</button>:<Link href={"/auth/login"} className='list-none  hover:underline'>Login</Link>}
         </div>
     </nav>
   )

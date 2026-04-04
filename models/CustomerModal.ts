@@ -10,7 +10,14 @@ const CustomerModal = new mongoose.Schema({
     },
     password:{
         type:String
-    }
+    },
+    phone:{
+        type:String,
+    },
+    location:{
+        type:String
+    },
+
 });
 
 const customer = mongoose.models.customer || mongoose.model('customer',CustomerModal);

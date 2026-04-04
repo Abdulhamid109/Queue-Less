@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react'
 const Page = () => {
     const [locationCheck,setLocationCheck] = useState<boolean>(false);
     const [locationLoading,setLocationLoading] = useState<boolean>(false);
-    //function to fetch the current location
+    
     const getLocation = (): Promise<GeolocationPosition> => {
         return new Promise((resolve, reject) => {
             if (!navigator.geolocation) {

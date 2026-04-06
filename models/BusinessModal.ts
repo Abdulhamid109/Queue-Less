@@ -6,7 +6,15 @@ const BusinessModal = new mongoose.Schema({
         type:String,
     },
     BusinessCurrentLocation:{
-        type:String,
+        type:{
+            type:String,
+            enum:["Point"],
+            required:true
+        },
+        coordinates:{
+            type:[Number],
+            required:true
+        }
     },
     BusinessAddress:{
         type:String

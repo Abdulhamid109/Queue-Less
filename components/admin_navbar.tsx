@@ -2,6 +2,7 @@ import Link from 'next/link'
 import React from 'react'
 
 const Admin_navbar = () => {
+    
     return (
         <nav className='flex justify-between items-center p-3 bg-gradient-to-l from-green-400 to-gray-300'>
             <Link href={"/admin/homepage"} className='text-2xl'>Queue-Less</Link>

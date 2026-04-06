@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect } from 'react'
+import React from 'react'
 import { getCookie } from 'cookies-next'
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
@@ -8,14 +8,10 @@ import Link from 'next/link';
 const Cust_navbar = () => {
   const session = getCookie('token');
   const router = useRouter();
-  console.log("cookie"+session);
-  // useEffect(()=>{
-  //   console.log("cookie"+session);
-  // },)
+
 
   const handleLogout = async()=>{
     try {
-      console.log("Token"+session)
       const response = await fetch("/api/customer/auth/logout",{
         method:'GET'
       });
@@ -43,7 +39,7 @@ const Cust_navbar = () => {
         </Link>
         }
         <div className='flex justify-center items-center gap-2 m-2'>
-          <Link href={"/profile"} className='list-none  hover:underline'>Profile</Link>
+          {session&&<Link href={"/profile"} className='list-none  hover:underline'>Profile</Link>}
             <li className='list-none  hover:underline'>About us</li>
             <li className='list-none  hover:underline'>Contact</li>
             {/* based on the token update the Navbar */}

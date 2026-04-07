@@ -1,23 +1,13 @@
 "use client"
 import Cust_navbar from '@/components/cust_navbar';
+import { getLocation } from '@/helpers/getCurrentLocation';
 import React, { useEffect, useState } from 'react'
 
 const Page = () => {
     const [locationCheck,setLocationCheck] = useState<boolean>(false);
     const [locationLoading,setLocationLoading] = useState<boolean>(false);
     
-    const getLocation = (): Promise<GeolocationPosition> => {
-        return new Promise((resolve, reject) => {
-            if (!navigator.geolocation) {
-                reject(new Error("Geolocation is not supported by this browser."));
-            }
-
-            navigator.geolocation.getCurrentPosition(
-                (position) => resolve(position),
-                (error) => reject(error)
-            );
-        });
-    };
+    
 
 
     useEffect(() => {

@@ -10,11 +10,11 @@ interface DataFormat {
     password: string;
 }
 const Page = () => {
-            const [data, setdata] = useState<DataFormat | null>(null);
-            const [loading, setLoading] = useState<boolean>(false);
-            const router = useRouter();
+    const [data, setdata] = useState<DataFormat | null>(null);
+    const [loading, setLoading] = useState<boolean>(false);
+    const router = useRouter();
 
-                        const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
         setLoading(true);
         try {
@@ -38,10 +38,10 @@ const Page = () => {
             } else {
                 toast.error("Unexpected error occurred");
             }
-    }finally{
-        setLoading(false);
+        } finally {
+            setLoading(false);
+        }
     }
-}
     return (
         <div className="min-h-screen w-full flex items-center justify-center bg-gray-100">
             <div className="w-full max-w-md bg-white shadow-lg rounded-2xl p-8">
@@ -61,7 +61,7 @@ const Page = () => {
                         <input
                             type="email"
                             value={data?.email}
-                            onChange={(e)=>setdata({...data!,email:e.target.value})}
+                            onChange={(e) => setdata({ ...data!, email: e.target.value })}
                             placeholder="Enter your company email"
                             required
                             className="p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
@@ -73,7 +73,7 @@ const Page = () => {
                         <input
                             type="password"
                             value={data?.password}
-                            onChange={(e)=>setdata({...data!,password:e.target.value})}
+                            onChange={(e) => setdata({ ...data!, password: e.target.value })}
                             placeholder="Enter your password"
                             required
                             className="p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
@@ -81,19 +81,19 @@ const Page = () => {
                     </div>
 
                     {
-                        loading?
-                        <button
-                        disabled
-                        className="mt-2 w-full bg-gray-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition duration-200"
-                    >
-                        loading...
-                    </button>
-                    :<button
-                        type="submit"
-                        className="mt-2 w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition duration-200"
-                    >
-                        login
-                    </button>
+                        loading ?
+                            <button
+                                disabled
+                                className="mt-2 w-full bg-gray-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition duration-200"
+                            >
+                                loading...
+                            </button>
+                            : <button
+                                type="submit"
+                                className="mt-2 w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition duration-200"
+                            >
+                                login
+                            </button>
                     }
                 </form>
 

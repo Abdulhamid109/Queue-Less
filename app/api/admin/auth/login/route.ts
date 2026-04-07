@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
             {status:200}
         )
 
-        response.cookies.set("admintoken",token,{httpOnly:true});
+        response.cookies.set("admintoken",token);
         return response;
     } catch (error) {
         return NextResponse.json(

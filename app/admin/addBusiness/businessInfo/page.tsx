@@ -14,6 +14,7 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 delete (L.Icon.Default.prototype as any)._getIconUrl
 L.Icon.Default.mergeOptions({
@@ -79,6 +80,7 @@ const Page = () => {
     const [dialogOpen, setDialogOpen] = useState(false)
     const searchRef = useRef<HTMLInputElement>(null);
     const [buttonLoadingState, setButtonLoadingState] = useState<boolean>(false);
+    const router = useRouter();
 
     useEffect(() => {
         const fetchCurrentLocation = async () => {
@@ -154,7 +156,7 @@ const Page = () => {
     }
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault()
+        e.preventDefault();
         if (!data.BusinessAddress) {
             toast.error("Please select a business address from the map.")
             return
@@ -180,7 +182,8 @@ const Page = () => {
                     localStorage.setItem("uid", resilt.Business._id);
                 }
                 console.log("Submitting:", data)
-                toast.success("Business info saved!")
+                toast.success("Business info saved!");
+                router.push("/admin/addBusiness/serviceInfo");
             }
 
         } catch (error) {
@@ -234,6 +237,7 @@ const Page = () => {
             } else {
                 toast.success("Successfully deleted the stored Form Data");
                 localStorage.removeItem("StepOne");
+                localStorage.removeItem("uid");
             }
         } catch (error) {
             console.log("Failed to Perform the functionality" + error);
@@ -250,7 +254,7 @@ const Page = () => {
             <p className='text-xl p-1'>Step One has been Completed : <Link className='hover:underline text-blue-500' href={"/admin/addBusiness/serviceInfo"}>Navigate to Step Two</Link></p>
             {
                 buttonLoadingState ? <button disabled className='rounded-md bg-gray-500 text-white p-1 hover:bg-gray-600'>Deleting....</button>
-                    : <button onClick={DeleteBusinessInfoDetails} className='rounded-md bg-red-500 text-white p-1 hover:bg-red-600'>Clear and Delete the Previous Form</button>
+                    : <button onClick={DeleteBusinessInfoDetails} className='rounded-md bg-red-500 text-white p-1 hover:bg-red-600'>Clear and Delete the Previous Details</button>
 
             }
         </div>

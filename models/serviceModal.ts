@@ -9,16 +9,11 @@ const ServiceModal = new mongoose.Schema({
         type:String
     },
     AvgDurationPerCustomer:{
-        type:String
+        type:Number
     },
-    AvgCustomerPerDay:{
-        type:String
-    },
-    CustomerLimitPerDay:{
-        type:String
-    },
+
     ChargesPerService:{
-        type:String
+        type:Number
     }
 });
 

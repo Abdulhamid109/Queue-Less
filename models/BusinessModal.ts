@@ -2,6 +2,9 @@ import mongoose from "mongoose";
 
 
 const BusinessModal = new mongoose.Schema({
+    adminid:{
+        type:String
+    },
     BusinessName:{
         type:String,
     },

@@ -8,7 +8,7 @@ interface ProfileData{
   name:string;
   email:string;
   phone:string;
-  location:string;
+  CustomerAddress:string;
 }
 const Page = () => {
   const [data,setData] = useState<ProfileData|null>(null);
@@ -67,7 +67,7 @@ const Page = () => {
           <div className='flex justify-start items-start p-1'>Name : <span>{data.name}</span></div>
           <div className='flex justify-start items-start p-1'>Email : <span>{data.email}</span></div>
           <div className='flex justify-start items-start p-1'>Phone : <span>{data.phone}</span> </div>
-          <div className='flex justify-start items-start p-1'>Location : <span>{data.location}</span> </div>
+          <div className='flex justify-start items-start p-1'>Location : <span className='text-xs'>{data.CustomerAddress}</span> </div>
           <button className='bg-blue-500 hover:bg-blue-600 flex justify-center items-center p-1 text-white rounded-md min-w-full'>Edit </button>
         </div>
       </section>

@@ -14,7 +14,18 @@ const CustomerModal = new mongoose.Schema({
     phone:{
         type:String,
     },
-    location:{
+    CustomerCurrentLocation:{
+        type:{
+            type:String,
+            enum:["Point"],
+            required:true
+        },
+        coordinates:{
+            type:[Number],
+            required:true
+        }
+    },
+    CustomerAddress:{
         type:String
     },
 

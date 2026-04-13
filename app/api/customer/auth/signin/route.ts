@@ -8,8 +8,8 @@ connect();
 
 export async function POST(request:NextRequest){
     try {
-        const {name,email,password} = await request.json();
-        if(!name||!email||!password){
+        const {name,email,password,latitude,longitude,phone,CustomerAddress} = await request.json();
+        if(!name||!email||!password||!phone||!latitude||!longitude||!CustomerAddress){
             return NextResponse.json(
                 {error:"Incomplete fields"},
                 {status:404}
@@ -22,7 +22,11 @@ export async function POST(request:NextRequest){
         const newCustomer = new customer({
             name,
             email,
-            password:hashedPassword
+            password:hashedPassword,
+            phone,
+            "CustomerCurrentLocation.type":"Point",
+            "CustomerCurrentLocation.coordinates": [longitude,latitude],
+            CustomerAddress
         });
 
         const savedCustomer = await newCustomer.save();

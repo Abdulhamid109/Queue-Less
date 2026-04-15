@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-
+// AvgDurationPerCustomer -> can be treated as service time
 const ServiceModal = new mongoose.Schema({
     businessId:{
         type:String

@@ -11,7 +11,7 @@ const QueueModal = new mongoose.Schema({
         type:String
     },
     ServiceId:{
-        type:String
+        type:[String]
     },
     Addedat:{
         type:String

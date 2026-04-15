@@ -1,6 +1,7 @@
 "use client"
 import Cust_navbar from '@/components/cust_navbar';
 import { getLocation } from '@/helpers/getCurrentLocation';
+import Link from 'next/link';
 import React, { useEffect, useState } from 'react'
 
 const Page = () => {
@@ -68,14 +69,14 @@ const Page = () => {
                     Business Categories
                 </section>
                 <section className='grid md:grid-cols-3 grid-cols-1 relative md:m-[5vh] '>
-                    <div className='flex flex-col text-white  bg-gradient-to-r from-gray-400 to-gray-600 rounded-md p-2 m-1 justify-center items-center'>
+                    <Link href={`/allbusiness/HairSaloons`} className='flex flex-col text-white  bg-gradient-to-r from-gray-400 to-gray-600 rounded-md p-2 m-1 justify-center items-center'>
                         Business - HairSaloons
                         <p className='font-thin'>Find all your hairsaloons near by</p>
-                    </div>
-                    <div className='flex flex-col text-white  bg-gradient-to-r from-gray-400 to-gray-600 rounded-md p-2 m-1 justify-center items-center'>
+                    </Link>
+                    <Link href={`/allbusiness/Clinics`} className='flex flex-col text-white  bg-gradient-to-r from-gray-400 to-gray-600 rounded-md p-2 m-1 justify-center items-center'>
                         Business - Clinics
                         <p className='font-thin'>Find all your Clinics near by</p>
-                    </div>
+                    </Link >
                     <div className='flex flex-col text-white  bg-gradient-to-r from-gray-400 to-gray-600 rounded-md p-2 m-1 justify-center items-center'>
                         Explore All Business Categories
                     </div>

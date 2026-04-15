@@ -50,5 +50,7 @@ const BusinessModal = new mongoose.Schema({
 
 });
 
-const business = mongoose.models.business || mongoose.model('business',BusinessModal);
+BusinessModal.index({BusinessCurrentLocation:"2dsphere"})
+
+const business = mongoose.models.Business || mongoose.model('Business',BusinessModal);
 export default business;

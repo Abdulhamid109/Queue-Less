@@ -31,5 +31,7 @@ const CustomerModal = new mongoose.Schema({
 
 });
 
+// CustomerModal.index({CustomerCurrentLocation:"2dsphere"})
+
 const customer = mongoose.models.customer || mongoose.model('customer',CustomerModal);
 export default customer;

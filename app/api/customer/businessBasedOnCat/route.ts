@@ -9,12 +9,16 @@ connect();
 
 
 
-export async function GET(request: NextRequest) {
+export async function POST(request: NextRequest) {
+    await business.syncIndexes()
+
     try {
         const { searchParams } = new URL(request.url);
-        const { coordinates } = await request.json();
+        const { latitude,longitude } = await request.json();
         const categoryBlob = searchParams.get("category");
-        if (coordinates) {
+        console.log("Latitude"+latitude)
+        console.log("Longotude"+longitude)
+        if (!latitude || !longitude) {
             return NextResponse.json(
                 { error: "No Location access" },
                 { status: 404 }
@@ -27,7 +31,7 @@ export async function GET(request: NextRequest) {
                 $geoNear: {
                     near: {
                         type: "Point",
-                        coordinates: coordinates,
+                        coordinates: [longitude,latitude],
                     },
                     distanceField: "distance",
                     maxDistance: 4000,
@@ -37,7 +41,14 @@ export async function GET(request: NextRequest) {
                     },
                 },
             },
+            {
+                $sort:{
+                    distance:1
+                }
+            },
         ]);
+
+        console.log("Data => "+JSON.stringify(allbusiness));
 
         return NextResponse.json(
             {success:true,businessess:allbusiness},
@@ -46,6 +57,7 @@ export async function GET(request: NextRequest) {
 
 
     } catch (error) {
+        console.log("error=>"+error)
         return NextResponse.json(
             { error: "Internal Server error" + error },
             { status: 500 }

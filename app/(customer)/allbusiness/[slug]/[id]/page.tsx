@@ -1,7 +1,7 @@
 "use client"
 import Cust_navbar from '@/components/cust_navbar';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { BriefcaseBusiness, LocateFixed, LucideEarth, PersonStanding, PlusCircle, Timer } from 'lucide-react';
+import { BriefcaseBusiness, LocateFixed, LucideEarth, MinusCircle, PersonStanding, PlusCircle, Timer } from 'lucide-react';
 import { useParams } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast';
@@ -43,41 +43,41 @@ const Page = () => {
 
     // Replacing plain array + single boolean with a Set
     const [selectedServices, setSelectedServices] = useState<Set<string>>(new Set());
-    const [joinedQueue,setJoinedQueue] = useState<boolean>(false);
+    const [joinedQueue, setJoinedQueue] = useState<boolean>(false);
 
     // fetching the Total members in the queue (making sure the buffer time is of 1/2min) based on the date
 
     useEffect(() => {
-    if (!id) return
+        if (!id) return
 
-    console.log("SSE starts with id:", id)
-    const SSEevent = new EventSource(`/api/customer/TotalMembers?bid=${id}`)
+        console.log("SSE starts with id:", id)
+        const SSEevent = new EventSource(`/api/customer/TotalMembers?bid=${id}`)
 
-    SSEevent.onopen = () => {
-        console.log("SSE opened")
-        setIsLive(true)
-    }
+        SSEevent.onopen = () => {
+            console.log("SSE opened")
+            setIsLive(true)
+        }
 
-    SSEevent.onmessage = (e) => {
-        const data = JSON.parse(e.data)
-        setQueueCount(data.count)
-        console.log("Count =>", data)
-    }
+        SSEevent.onmessage = (e) => {
+            const data = JSON.parse(e.data)
+            setQueueCount(data.count)
+            // console.log("Count =>", data)
+        }
 
-    SSEevent.onerror = () => {
-        setIsLive(false)
-        SSEevent.close()
-    }
+        SSEevent.onerror = () => {
+            setIsLive(false)
+            SSEevent.close()
+        }
 
-    return () => {
-        SSEevent.close()
-        setIsLive(false)
-    }
+        return () => {
+            SSEevent.close()
+            setIsLive(false)
+        }
 
-}, [id]) // ✅ re-runs when id becomes available
+    }, [id]);
 
 
-  
+
 
 
 
@@ -153,17 +153,17 @@ const Page = () => {
                 businessId: id,
                 services: Array.from(selectedServices)
             };
-            console.log("Payload Data => "+JSON.stringify(payload))
-            const response = await fetch(`/api/customer/joinQueue`,{
-                headers:{'Content-Type':'application/json'},
-                method:'POST',
-                body:JSON.stringify(payload)
+            console.log("Payload Data => " + JSON.stringify(payload))
+            const response = await fetch(`/api/customer/joinQueue`, {
+                headers: { 'Content-Type': 'application/json' },
+                method: 'POST',
+                body: JSON.stringify(payload)
             });
             const result = await response.json();
-             if(!response.ok){
+            if (!response.ok) {
                 throw new Error(result.error || "Something went wrong!");
-            }else{
-                setJoinedQueue(true);
+            } else {
+                setJoinedQueue(result.queue.JoinedQueue);
                 toast.success("Successfully joined the queue!");
             }
         } catch (error) {
@@ -173,10 +173,25 @@ const Page = () => {
     }
 
 
-    //we need to check if the user is in the Queue
-    const CurrentUserQueueStatus = async()=>{
+    //we need to check if the user is in the Queue(vulnerable)
+    const CurrentUserQueueStatus = async () => {
         try {
-            const response = await fetch("/api/customer/currentUserQueueStatus")
+            const response = await fetch(`/api/customer/currentUserQueueStatus?bid=${id}`,{
+                headers:{'Content-Type':'application/json'},
+                method:'GET'
+            });
+            const result = await response.json();
+
+            if(response.status===401){
+                setJoinedQueue(false);
+            }
+            if(!response.ok){
+                setJoinedQueue(false);
+            }
+            else {
+                console.log("Status=>"+result.Joined)
+                setJoinedQueue(result.Joined);
+            }
         } catch (error) {
             console.error("Error=>", error);
             if (error instanceof Error) {
@@ -185,8 +200,14 @@ const Page = () => {
         }
     }
 
+    useEffect(()=>{
+        CurrentUserQueueStatus();
+    },[id])
+
+
     useEffect(() => {
         fetchBusinessDetails();
+        
     }, []);
 
     if (loading) {
@@ -234,88 +255,92 @@ const Page = () => {
                     <p>Queue Details</p>
 
                     {
-                        joinedQueue?
-                        <button>Leave Queue</button>
-                        :<Dialog>
-                        <DialogTrigger asChild>
+                        joinedQueue ?
                             <button
-                                type="button"
-                                onClick={fetchingService}
                                 className='text-[15px] flex justify-center items-center bg-purple-800 p-1 rounded-md gap-1 text-white'
                             >
-                                <PlusCircle size={16} color='white' />
-                                Join Queue
-                            </button>
-                        </DialogTrigger>
+                                <MinusCircle size={16} color='white' />
+                                Leave Queue</button>
+                            : <Dialog>
+                                <DialogTrigger asChild>
+                                    <button
+                                        type="button"
+                                        onClick={fetchingService}
+                                        className='text-[15px] flex justify-center items-center bg-purple-800 p-1 rounded-md gap-1 text-white'
+                                    >
+                                        <PlusCircle size={16} color='white' />
+                                        Join Queue
+                                    </button>
+                                </DialogTrigger>
 
-                        <DialogContent>
-                            <DialogTitle className='text-center'>Select the Service</DialogTitle>
-                            <DialogDescription asChild>
-                                <div className='flex flex-col gap-2'>
+                                <DialogContent>
+                                    <DialogTitle className='text-center'>Select the Service</DialogTitle>
+                                    <DialogDescription asChild>
+                                        <div className='flex flex-col gap-2'>
 
-                                    {serviceLoader ? (
-                                        <div className='flex justify-center items-center animate-pulse py-4'>
-                                            Loading services...
-                                        </div>
-                                    ) : serviceData.length === 0 ? (
-                                        <div className='text-center text-gray-500 py-4'>
-                                            No associated services available
-                                        </div>
-                                    ) : (
-                                        serviceData.map((d: ServiceDetails) => (
-                                            <div
-                                                key={d._id}
-                                                className={`flex justify-between items-center gap-3 p-2 rounded-md border transition ${selectedServices.has(d._id)
-                                                        ? 'bg-green-100 border-green-400'
-                                                        : 'bg-green-200 border-transparent'
-                                                    }`}
-                                            >
-                                                <div className='flex flex-col items-start justify-center gap-1 text-black'>
-                                                    <p className='font-medium'>Service Name: {d.name}</p>
-                                                    <p className='text-sm'>Duration: {d.AvgDurationPerCustomer} mins</p>
-                                                    <p className='text-sm'>Charge: ₹{d.ChargesPerService}</p>
+                                            {serviceLoader ? (
+                                                <div className='flex justify-center items-center animate-pulse py-4'>
+                                                    Loading services...
                                                 </div>
+                                            ) : serviceData.length === 0 ? (
+                                                <div className='text-center text-gray-500 py-4'>
+                                                    No associated services available
+                                                </div>
+                                            ) : (
+                                                serviceData.map((d: ServiceDetails) => (
+                                                    <div
+                                                        key={d._id}
+                                                        className={`flex justify-between items-center gap-3 p-2 rounded-md border transition ${selectedServices.has(d._id)
+                                                            ? 'bg-green-100 border-green-400'
+                                                            : 'bg-green-200 border-transparent'
+                                                            }`}
+                                                    >
+                                                        <div className='flex flex-col items-start justify-center gap-1 text-black'>
+                                                            <p className='font-medium'>Service Name: {d.name}</p>
+                                                            <p className='text-sm'>Duration: {d.AvgDurationPerCustomer} mins</p>
+                                                            <p className='text-sm'>Charge: ₹{d.ChargesPerService}</p>
+                                                        </div>
 
-                                                <button
-                                                    type="button"
-                                                    onClick={() => selectService(d._id)}
-                                                    className={`px-3 py-1 rounded-md text-sm font-medium transition ${selectedServices.has(d._id)
-                                                            ? 'bg-green-500 text-white'
-                                                            : 'bg-blue-400 text-black hover:bg-blue-500'
-                                                        }`}
-                                                >
-                                                    {selectedServices.has(d._id) ? "Selected ✓" : "Select"}
-                                                </button>
-                                            </div>
-                                        ))
-                                    )}
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => selectService(d._id)}
+                                                            className={`px-3 py-1 rounded-md text-sm font-medium transition ${selectedServices.has(d._id)
+                                                                ? 'bg-green-500 text-white'
+                                                                : 'bg-blue-400 text-black hover:bg-blue-500'
+                                                                }`}
+                                                        >
+                                                            {selectedServices.has(d._id) ? "Selected ✓" : "Select"}
+                                                        </button>
+                                                    </div>
+                                                ))
+                                            )}
 
-                                    {selectedServices.size > 0 && (
-                                        <div className='flex justify-between items-center mt-2 pt-2 border-t border-gray-200'>
-                                            <DialogClose asChild>
-                                                <button
-                                                    type="button"
-                                                    onClick={handleJoinQueue}
-                                                    className='bg-blue-500 hover:bg-blue-600 text-white px-4 py-1.5 rounded-md text-sm transition'
-                                                >
-                                                    Join Queue ({selectedServices.size})
-                                                </button>
-                                            </DialogClose>
-                                            <DialogClose asChild>
-                                                <button
-                                                    type="button"
-                                                    className='border border-gray-300 px-4 py-1.5 rounded-md text-sm hover:bg-gray-100 transition'
-                                                >
-                                                    Close
-                                                </button>
-                                            </DialogClose>
+                                            {selectedServices.size > 0 && (
+                                                <div className='flex justify-between items-center mt-2 pt-2 border-t border-gray-200'>
+                                                    <DialogClose asChild>
+                                                        <button
+                                                            type="button"
+                                                            onClick={handleJoinQueue}
+                                                            className='bg-blue-500 hover:bg-blue-600 text-white px-4 py-1.5 rounded-md text-sm transition'
+                                                        >
+                                                            Join Queue ({selectedServices.size})
+                                                        </button>
+                                                    </DialogClose>
+                                                    <DialogClose asChild>
+                                                        <button
+                                                            type="button"
+                                                            className='border border-gray-300 px-4 py-1.5 rounded-md text-sm hover:bg-gray-100 transition'
+                                                        >
+                                                            Close
+                                                        </button>
+                                                    </DialogClose>
+                                                </div>
+                                            )}
+
                                         </div>
-                                    )}
-
-                                </div>
-                            </DialogDescription>
-                        </DialogContent>
-                    </Dialog>
+                                    </DialogDescription>
+                                </DialogContent>
+                            </Dialog>
                     }
                 </div>
 

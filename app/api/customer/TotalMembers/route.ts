@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
                         const localeDate = Datee.toLocaleDateString();
 
                         const QueueDB = await queue.countDocuments({ businessId: bid, date: localeDate, status: "active" });
-                        console.log("Total => "+QueueDB)
+                        // console.log("Total => "+QueueDB)
                         controller.enqueue(`data: ${JSON.stringify({ count: QueueDB })}\n\n`)
 
 

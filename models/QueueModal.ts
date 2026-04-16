@@ -21,6 +21,10 @@ const QueueModal = new mongoose.Schema({
     //neeed to update based on the logic
     status:{
         type:String
+    },
+    JoinedQueue:{
+        type:Boolean,
+        default:false
     }
 });
 

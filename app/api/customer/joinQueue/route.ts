@@ -3,6 +3,7 @@ import { GETTOKENDATA } from "@/helpers/getTokenData";
 import queue from "@/models/QueueModal";
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
+import { GETQUEUETOKENDATA } from "@/helpers/getQueueData";
 
 
 connect();
@@ -24,6 +25,15 @@ export async function POST(request:NextRequest){
         const Datee = new Date();
         const localeDate = Datee.toLocaleDateString();
 
+        const qid = await GETQUEUETOKENDATA(request);
+        console.log("QID => "+qid);
+        const UserJoinedStatus = await queue.findOne({businessId:businessId,_id:qid});;
+        if(UserJoinedStatus){
+            return NextResponse.json(
+                {error:"User already Joined"},
+                {status:404}
+            )
+        }
         
 
         const newQueueJoinee = new queue({
@@ -31,11 +41,10 @@ export async function POST(request:NextRequest){
             businessId,
             ServiceId:services,
             date:localeDate,
-            status:"active"
+            status:"active",
+            JoinedQueue:true
         });
 
-        
-        
         const savedQueue = await newQueueJoinee.save();
         //storing the queueid in the browser queue (this will be only of current user)
         const payload = {

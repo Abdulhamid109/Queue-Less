@@ -35,6 +35,8 @@ const Page = () => {
 
     const [serviceData, setServiceData] = useState<ServiceDetails[]>([]);
     const [serviceLoader, setServiceLoader] = useState<boolean>(true);
+    const [queueCount, setQueueCount] = useState<number>(0)
+    const [isLive, setIsLive] = useState<boolean>(false)
 
     const date = new Date();
     const localDate = date.toLocaleDateString();
@@ -42,7 +44,34 @@ const Page = () => {
     // Replacing plain array + single boolean with a Set
     const [selectedServices, setSelectedServices] = useState<Set<string>>(new Set());
 
-    // fetching the Total members in the queue (making sure the buffer time is of 1min) based on the date
+    // fetching the Total members in the queue (making sure the buffer time is of 1/2min) based on the date
+
+    useEffect(() => {
+        // opening an sse connection
+        const SSEevent = new EventSource(`/api/customer/totalMembers?bid=${id}`);
+
+
+        SSEevent.onopen = () => {
+            setIsLive(true);
+        }
+
+        SSEevent.onmessage = (e) => {
+            const data = JSON.parse(e.data)
+            setQueueCount(data.count)
+        }
+
+        SSEevent.onerror = () => {
+            setIsLive(false)
+            SSEevent.close()
+        }
+
+        return () => {
+            SSEevent.close();
+            setIsLive(false);
+        }
+
+    }, [id])
+
 
 
     const fetchBusinessDetails = async () => {
@@ -202,11 +231,10 @@ const Page = () => {
                                         serviceData.map((d: ServiceDetails) => (
                                             <div
                                                 key={d._id}
-                                                className={`flex justify-between items-center gap-3 p-2 rounded-md border transition ${
-                                                    selectedServices.has(d._id)
+                                                className={`flex justify-between items-center gap-3 p-2 rounded-md border transition ${selectedServices.has(d._id)
                                                         ? 'bg-green-100 border-green-400'
                                                         : 'bg-green-200 border-transparent'
-                                                }`}
+                                                    }`}
                                             >
                                                 <div className='flex flex-col items-start justify-center gap-1 text-black'>
                                                     <p className='font-medium'>Service Name: {d.name}</p>
@@ -217,11 +245,10 @@ const Page = () => {
                                                 <button
                                                     type="button"
                                                     onClick={() => selectService(d._id)}
-                                                    className={`px-3 py-1 rounded-md text-sm font-medium transition ${
-                                                        selectedServices.has(d._id)
+                                                    className={`px-3 py-1 rounded-md text-sm font-medium transition ${selectedServices.has(d._id)
                                                             ? 'bg-green-500 text-white'
                                                             : 'bg-blue-400 text-black hover:bg-blue-500'
-                                                    }`}
+                                                        }`}
                                                 >
                                                     {selectedServices.has(d._id) ? "Selected ✓" : "Select"}
                                                 </button>
@@ -257,18 +284,31 @@ const Page = () => {
                     </Dialog>
                 </div>
 
-                <section className='flex flex-col justify-center items-center gap-3 backdrop-blur-2xl shadow-2xl shadow-black/20 mt-4 p-4 rounded-md'>
+                <section className='flex flex-col justify-center items-center gap-3 mt-4 p-4 rounded-md shadow-xl'>
+
+                    {/* Live indicator */}
                     <div className='flex items-center gap-2'>
-                        <span className='w-2 h-2 rounded-full bg-red-600 animate-pulse inline-block' />
-                        <span className='font-thin text-sm'>Live <span>({localDate})</span> </span>
+                        <span className={`w-2 h-2 rounded-full inline-block ${isLive ? 'bg-green-500 animate-pulse' : 'bg-red-500'
+                            }`} />
+                        <span className='text-sm font-thin'>
+                            {isLive ? 'Live' : 'Disconnected'}
+                        </span>
                     </div>
-                    <div className='text-2xl'>
-                        Total Members in the Queue
+
+                    <div className='text-2xl font-medium'>
+                        Total Members in Queue
                     </div>
-                    <div className='flex flex-col justify-center items-center p-4 text-gray-500'>
-                        <p>You haven&apos;t joined the queue yet</p>
-                        <p className='text-sm mt-1'>Waiting Time: —</p>
+
+                    <div className='text-5xl font-bold text-purple-800'>
+                        {queueCount}
                     </div>
+
+                    <p className='text-gray-500 text-sm'>
+                        {queueCount === 0
+                            ? "No one in the queue right now"
+                            : `Estimated wait: ${queueCount * 10} mins`}
+                    </p>
+
                 </section>
 
             </main>

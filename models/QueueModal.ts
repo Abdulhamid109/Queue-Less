@@ -13,8 +13,10 @@ const QueueModal = new mongoose.Schema({
     ServiceId:{
         type:[String]
     },
+    //for setting the positioin based on the time
     Addedat:{
-        type:String
+        type:Date,
+        default:new Date
     },
     //neeed to update based on the logic
     status:{

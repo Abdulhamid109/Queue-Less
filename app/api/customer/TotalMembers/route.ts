@@ -5,25 +5,24 @@ import { NextRequest, NextResponse } from "next/server";
 
 connect();
 export const dynamic = "force-dynamic"
-export async function GET(request:NextRequest){
+export async function GET(request: NextRequest) {
     try {
-        const {searchParams} = new URL(request.url);
+        const { searchParams } = new URL(request.url);
         const bid = searchParams.get('bid');
 
 
         //ReadableStream => A Web API create the stream of data chunks
         const stream = new ReadableStream({
-            async start(controller){
-                const send = async()=>{
+            async start(controller) {
+                const send = async () => {
                     try {
                         const Datee = new Date();
                         const localeDate = Datee.toLocaleDateString();
 
-                        const QueueDB = await queue.countDocuments({businessId:bid,date:localeDate,status:"active"});
+                        const QueueDB = await queue.countDocuments({ businessId: bid, date: localeDate, status: "active" });
+                        console.log("Total => "+QueueDB)
+                        controller.enqueue(`data: ${JSON.stringify({ count: QueueDB })}\n\n`)
 
-                        controller.enqueue(
-                            `data: : ${JSON.stringify(QueueDB)}`
-                        )
 
                     } catch (error) {
                         console.error("SSE error:", error)
@@ -31,34 +30,35 @@ export async function GET(request:NextRequest){
                 }
 
                 await send();
-                const interval = setInterval(send,10000);
+                const interval = setInterval(send, 1000);
 
 
                 //when the user disconnects cleanup the connection
-                request.signal.addEventListener("abort",()=>{
+                request.signal.addEventListener("abort", () => {
                     clearInterval(interval);
                     controller.close();
                 })
             }
         })
 
-        return NextResponse.json(
+        console.log("Stream"+stream);
+        return new Response(
             stream,
             {
-                headers:{
+                headers: {
                     "Content-Type": "text/event-stream",
-            "Cache-Control": "no-cache",
-            "Connection": "keep-alive",
+                    "Cache-Control": "no-cache",
+                    "Connection": "keep-alive",
+                }
             }
-        }
         )
 
-        
+
     } catch (error) {
-        console.log("Error"+error);
+        console.log("Error" + error);
         return NextResponse.json(
-            {error:"Internal Server error"+error},
-            {status:500}
+            { error: "Internal Server error" + error },
+            { status: 500 }
         )
     }
 }

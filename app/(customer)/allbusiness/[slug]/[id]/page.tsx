@@ -43,34 +43,41 @@ const Page = () => {
 
     // Replacing plain array + single boolean with a Set
     const [selectedServices, setSelectedServices] = useState<Set<string>>(new Set());
+    const [joinedQueue,setJoinedQueue] = useState<boolean>(false);
 
     // fetching the Total members in the queue (making sure the buffer time is of 1/2min) based on the date
 
     useEffect(() => {
-        // opening an sse connection
-        const SSEevent = new EventSource(`/api/customer/totalMembers?bid=${id}`);
+    if (!id) return
+
+    console.log("SSE starts with id:", id)
+    const SSEevent = new EventSource(`/api/customer/TotalMembers?bid=${id}`)
+
+    SSEevent.onopen = () => {
+        console.log("SSE opened")
+        setIsLive(true)
+    }
+
+    SSEevent.onmessage = (e) => {
+        const data = JSON.parse(e.data)
+        setQueueCount(data.count)
+        console.log("Count =>", data)
+    }
+
+    SSEevent.onerror = () => {
+        setIsLive(false)
+        SSEevent.close()
+    }
+
+    return () => {
+        SSEevent.close()
+        setIsLive(false)
+    }
+
+}, [id]) // ✅ re-runs when id becomes available
 
 
-        SSEevent.onopen = () => {
-            setIsLive(true);
-        }
-
-        SSEevent.onmessage = (e) => {
-            const data = JSON.parse(e.data)
-            setQueueCount(data.count)
-        }
-
-        SSEevent.onerror = () => {
-            setIsLive(false)
-            SSEevent.close()
-        }
-
-        return () => {
-            SSEevent.close();
-            setIsLive(false);
-        }
-
-    }, [id])
+  
 
 
 
@@ -146,11 +153,35 @@ const Page = () => {
                 businessId: id,
                 services: Array.from(selectedServices)
             };
-            console.log("Joining queue with:", payload);
-            toast.success("Successfully joined the queue!");
+            console.log("Payload Data => "+JSON.stringify(payload))
+            const response = await fetch(`/api/customer/joinQueue`,{
+                headers:{'Content-Type':'application/json'},
+                method:'POST',
+                body:JSON.stringify(payload)
+            });
+            const result = await response.json();
+             if(!response.ok){
+                throw new Error(result.error || "Something went wrong!");
+            }else{
+                setJoinedQueue(true);
+                toast.success("Successfully joined the queue!");
+            }
         } catch (error) {
             console.error("Join queue error:", error);
             if (error instanceof Error) toast.error(error.message);
+        }
+    }
+
+
+    //we need to check if the user is in the Queue
+    const CurrentUserQueueStatus = async()=>{
+        try {
+            const response = await fetch("/api/customer/currentUserQueueStatus")
+        } catch (error) {
+            console.error("Error=>", error);
+            if (error instanceof Error) {
+                toast.error(error.message || "Something went wrong!");
+            }
         }
     }
 
@@ -202,7 +233,10 @@ const Page = () => {
                 <div className='md:text-2xl text-xl mt-5 flex justify-between items-center'>
                     <p>Queue Details</p>
 
-                    <Dialog>
+                    {
+                        joinedQueue?
+                        <button>Leave Queue</button>
+                        :<Dialog>
                         <DialogTrigger asChild>
                             <button
                                 type="button"
@@ -282,6 +316,7 @@ const Page = () => {
                             </DialogDescription>
                         </DialogContent>
                     </Dialog>
+                    }
                 </div>
 
                 <section className='flex flex-col justify-center items-center gap-3 mt-4 p-4 rounded-md shadow-xl'>

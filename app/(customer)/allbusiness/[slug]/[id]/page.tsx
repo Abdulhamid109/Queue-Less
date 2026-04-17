@@ -2,9 +2,10 @@
 import Cust_navbar from '@/components/cust_navbar';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { BriefcaseBusiness, LocateFixed, LucideEarth, MinusCircle, PersonStanding, PlusCircle, Timer } from 'lucide-react';
-import { useParams } from 'next/navigation'
+import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast';
+
 
 interface BusinessFormat {
     BusinessName: string;
@@ -36,7 +37,7 @@ const Page = () => {
     const [serviceData, setServiceData] = useState<ServiceDetails[]>([]);
     const [serviceLoader, setServiceLoader] = useState<boolean>(true);
     const [queueCount, setQueueCount] = useState<number>(0)
-    const [isLive, setIsLive] = useState<boolean>(false)
+    const [isLive, setIsLive] = useState<boolean>(false);
 
     const date = new Date();
     const localDate = date.toLocaleDateString();
@@ -44,6 +45,14 @@ const Page = () => {
     // Replacing plain array + single boolean with a Set
     const [selectedServices, setSelectedServices] = useState<Set<string>>(new Set());
     const [joinedQueue, setJoinedQueue] = useState<boolean>(false);
+    const router = useRouter();
+    const searchParams = useSearchParams(); // add this
+const queueIdFromUrl = searchParams.get("QUEUE_ID");
+
+// Update QueueID initialization
+const [QueueID, setQueueID] = useState<string>(queueIdFromUrl || '');
+
+
 
     // fetching the Total members in the queue (making sure the buffer time is of 1/2min) based on the date
 
@@ -164,7 +173,9 @@ const Page = () => {
                 throw new Error(result.error || "Something went wrong!");
             } else {
                 setJoinedQueue(result.queue.JoinedQueue);
+                setQueueID(result.queue._id);
                 toast.success("Successfully joined the queue!");
+                router.push(`/allbusiness/HairSaloons/${id}?QUEUE_ID=${result.queue._id}`)
             }
         } catch (error) {
             console.error("Join queue error:", error);
@@ -176,20 +187,21 @@ const Page = () => {
     //we need to check if the user is in the Queue(vulnerable)
     const CurrentUserQueueStatus = async () => {
         try {
-            const response = await fetch(`/api/customer/currentUserQueueStatus?bid=${id}`,{
-                headers:{'Content-Type':'application/json'},
-                method:'GET'
+            
+            const response = await fetch(`/api/customer/currentUserQueueStatus?bid=${id}`, {
+                headers: { 'Content-Type': 'application/json' },
+                method: 'GET'
             });
             const result = await response.json();
 
-            if(response.status===401){
+            if (response.status === 401) {
                 setJoinedQueue(false);
             }
-            if(!response.ok){
+            if (!response.ok) {
                 setJoinedQueue(false);
             }
             else {
-                console.log("Status=>"+result.Joined)
+                console.log("Status=>" + result.Joined)
                 setJoinedQueue(result.Joined);
             }
         } catch (error) {
@@ -200,15 +212,28 @@ const Page = () => {
         }
     }
 
-    useEffect(()=>{
-        CurrentUserQueueStatus();
-    },[id])
+// Update the useEffect dependency and guard
+useEffect(() => {
+    CurrentUserQueueStatus();
+}, [id, QueueID]);
 
 
     useEffect(() => {
         fetchBusinessDetails();
-        
+
     }, []);
+
+
+    const leaveQueue = async () => {
+        try {
+
+        } catch (error) {
+            console.error("Error=>", error);
+            if (error instanceof Error) {
+                toast.error(error.message || "Something went wrong!");
+            }
+        }
+    }
 
     if (loading) {
         return (

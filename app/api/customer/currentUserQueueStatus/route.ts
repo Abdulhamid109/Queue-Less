@@ -1,36 +1,73 @@
-// to check whether the current user is present in the Queue 
-
 import { connect } from "@/config/dbconfig";
-import { GETQUEUETOKENDATA } from "@/helpers/getQueueData";
+import { GETTOKENDATA } from "@/helpers/getTokenData";
+import customer from "@/models/CustomerModal";
 import queue from "@/models/QueueModal";
 import { NextRequest, NextResponse } from "next/server";
 
-
 connect();
+
 export async function GET(request: NextRequest) {
     try {
-        const qid = await GETQUEUETOKENDATA(request);
-        const {searchParams} = new URL(request.url);
+        const { searchParams } = new URL(request.url);
         const bid = searchParams.get("bid");
-        // based on this make sure you display whether the user is in the Queue or not!
-        console.log("QID => "+JSON.stringify(qid))
-        if (!qid) {
+
+        if (!bid) {
             return NextResponse.json(
-                { error: "Queue not found!" },
-                { status: 401 }
-            )
+                { error: "Business ID is required!" },
+                { status: 400 }
+            );
         }
-        const QueueStatus = await queue.findOne({businessId:bid,_id:qid});
+
+        // Get the logged-in user's ID from their auth token
+        const uid = await GETTOKENDATA(request);
+        if (!uid) {
+            return NextResponse.json(
+                { error: "Unauthorized User!" },
+                { status: 401 }
+            );
+        }
+
+        // Find the user and look up their activeQueues for this business
+        const user = await customer.findById(uid);
+        if (!user) {
+            return NextResponse.json(
+                { error: "User not found!" },
+                { status: 404 }
+            );
+        }
+
+        const entry = user.activeQueues?.find(
+            (q: { businessId: { toString: () => string } }) =>
+                q.businessId.toString() === bid
+        );
+
+        // User has no queue entry for this business
+        if (!entry) {
+            return NextResponse.json(
+                { success: true, Joined: false },
+                { status: 200 }
+            );
+        }
+
+        // Check the actual queue document status
+        const queueStatus = await queue.findById(entry.queueId);
+        if (!queueStatus) {
+            return NextResponse.json(
+                { success: true, Joined: false },
+                { status: 200 }
+            );
+        }
+
         return NextResponse.json(
-            { success: true, Joined: QueueStatus.JoinedQueue },
+            { success: true, Joined: queueStatus.JoinedQueue, queueId: queueStatus._id },
             { status: 200 }
-        )
+        );
 
     } catch (error) {
-        console.log("Error from server =>"+error);
+        console.log("Error from server => " + error);
         return NextResponse.json(
-            { error: "Internal Server error" + error },
+            { error: "Internal Server error: " + error },
             { status: 500 }
-        )
+        );
     }
 }

@@ -28,6 +28,13 @@ const CustomerModal = new mongoose.Schema({
     CustomerAddress:{
         type:String
     },
+    activeQueues: [
+    {
+        businessId: { type: String, ref: 'Business' },
+        queueId:    { type: String, ref: 'queue' },
+        date:String
+    }
+]
 
 });
 

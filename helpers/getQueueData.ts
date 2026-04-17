@@ -16,9 +16,6 @@ export async function GETQUEUETOKENDATA(request: NextRequest) {
         const data = jwt.verify(token!, process.env.SECRET_KEY!,) as DecodedData;
         return data.qid;
     } catch (error) {
-        return NextResponse.json(
-            { error: "Internal Server error" + error },
-            { status: 500 }
-        )
+        throw new Error("Error"+error);
     }
 }

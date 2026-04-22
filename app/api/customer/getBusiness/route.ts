@@ -24,7 +24,7 @@ export async function GET(request:NextRequest) {
         return NextResponse.json(
             {success:true,business:businessDetails,time:BusinessTimeDetails},
             {status:200}
-        )
+        );
     } catch (error) {
         console.log("Error=>"+error);
         return NextResponse.json(

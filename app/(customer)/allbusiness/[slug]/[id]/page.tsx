@@ -34,10 +34,14 @@ const Page = () => {
         CustomerLimitPerDay: ""
     });
 
+    const [currentPostion, setCurrentPostion] = useState<string>('');
+
     const [serviceData, setServiceData] = useState<ServiceDetails[]>([]);
     const [serviceLoader, setServiceLoader] = useState<boolean>(true);
     const [queueCount, setQueueCount] = useState<number>(0)
     const [isLive, setIsLive] = useState<boolean>(false);
+    const [WT,setWT] = useState<string>('');
+    const [leaveLoader,setLeaveLoader] = useState<boolean>(false);
 
     const date = new Date();
     const localDate = date.toLocaleDateString();
@@ -47,10 +51,10 @@ const Page = () => {
     const [joinedQueue, setJoinedQueue] = useState<boolean>(false);
     const router = useRouter();
     const searchParams = useSearchParams(); // add this
-const queueIdFromUrl = searchParams.get("QUEUE_ID");
+    const queueIdFromUrl = searchParams.get("QUEUE_ID");
 
-// Update QueueID initialization
-const [QueueID, setQueueID] = useState<string>(queueIdFromUrl || '');
+    // Update QueueID initialization
+    const [QueueID, setQueueID] = useState<string>(queueIdFromUrl || '');
 
 
 
@@ -174,6 +178,8 @@ const [QueueID, setQueueID] = useState<string>(queueIdFromUrl || '');
             } else {
                 setJoinedQueue(result.queue.JoinedQueue);
                 setQueueID(result.queue._id);
+                setCurrentPostion(result.queue.currentPostion)
+                setWT(result.WT)
                 toast.success("Successfully joined the queue!");
                 router.push(`/allbusiness/HairSaloons/${id}?QUEUE_ID=${result.queue._id}`)
             }
@@ -187,7 +193,7 @@ const [QueueID, setQueueID] = useState<string>(queueIdFromUrl || '');
     //we need to check if the user is in the Queue(vulnerable)
     const CurrentUserQueueStatus = async () => {
         try {
-            
+
             const response = await fetch(`/api/customer/currentUserQueueStatus?bid=${id}`, {
                 headers: { 'Content-Type': 'application/json' },
                 method: 'GET'
@@ -201,8 +207,11 @@ const [QueueID, setQueueID] = useState<string>(queueIdFromUrl || '');
                 setJoinedQueue(false);
             }
             else {
-                console.log("Status=>" + result.Joined)
+                console.log("Status=>" + result.Joined);
                 setJoinedQueue(result.Joined);
+                if(result.Joined) setCurrentPostion(result.currentPosition ?? '')
+                
+                
             }
         } catch (error) {
             console.error("Error=>", error);
@@ -212,10 +221,10 @@ const [QueueID, setQueueID] = useState<string>(queueIdFromUrl || '');
         }
     }
 
-// Update the useEffect dependency and guard
-useEffect(() => {
-    CurrentUserQueueStatus();
-}, [id, QueueID]);
+    // Update the useEffect dependency and guard
+    useEffect(() => {
+        CurrentUserQueueStatus();
+    }, [id, QueueID]);
 
 
     useEffect(() => {
@@ -225,13 +234,34 @@ useEffect(() => {
 
 
     const leaveQueue = async () => {
+        setLeaveLoader(true);
         try {
+            const response = await fetch(`/api/customer/leaveQueue?bid=${id}`,
+                {
+                    method:'DELETE',
+                    headers:{'Content-Type':'application/json'}
+                }
+            );
+
+            const result = await response.json();
+            if(!response.ok){
+                throw new Error(result.error || "Something went wrong!!")
+            }else{
+                toast.success("Successfully left the Queue");
+                setWT('');
+                setTimeout(() => {
+                    window.location.reload();
+                }, 500);
+                // router.refresh();
+            }
 
         } catch (error) {
             console.error("Error=>", error);
             if (error instanceof Error) {
                 toast.error(error.message || "Something went wrong!");
             }
+        }finally{
+            setLeaveLoader(false)
         }
     }
 
@@ -282,10 +312,13 @@ useEffect(() => {
                     {
                         joinedQueue ?
                             <button
+                            onClick={leaveQueue}
+                            disabled={leaveLoader}
                                 className='text-[15px] flex justify-center items-center bg-purple-800 p-1 rounded-md gap-1 text-white'
                             >
                                 <MinusCircle size={16} color='white' />
-                                Leave Queue</button>
+                                {leaveLoader?<>Leaving....</>:<>Leave Queue</>}
+                                </button>
                             : <Dialog>
                                 <DialogTrigger asChild>
                                     <button
@@ -388,10 +421,23 @@ useEffect(() => {
                         {queueCount}
                     </div>
 
+                    {
+                        currentPostion && (
+                            <div className='text-xl font-bold text-gray-600'>
+                                Your Current Position in the Queue {currentPostion}
+                                {
+                                    WT&&(
+                                        <div className='text-gray-500 text-sm'>Estimated Wating Time : {WT} <span className='text-xs'>(minutes)</span> </div>
+                                    )
+                                }
+                            </div>
+                        )
+                    }
+
                     <p className='text-gray-500 text-sm'>
-                        {queueCount === 0
-                            ? "No one in the queue right now"
-                            : `Estimated wait: ${queueCount * 10} mins`}
+                        {queueCount === 0&&
+                             ("No one in the queue right now")
+                        }
                     </p>
 
                 </section>

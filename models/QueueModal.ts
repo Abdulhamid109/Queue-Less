@@ -22,10 +22,24 @@ const QueueModal = new mongoose.Schema({
     status:{
         type:String
     },
+    CurrentPostion:{
+        type:Number
+    },
     JoinedQueue:{
         type:Boolean,
         default:false
+    },
+    UserWaitingTime:{
+        type:Number
+    },
+    expectedStartTime:{
+        type:Date
+    },
+    //here we will : Started, waiting, failed
+    QueueStatus:{
+        type:String
     }
+    
 });
 
 const queue = mongoose.models.queue || mongoose.model('queue',QueueModal);

@@ -22,7 +22,8 @@ const ServiceInfo = () => {
         serviceName: '',
         serviceDuration: '',
         ServiceCharge: '',
-    })
+    });
+    // Make sure that service Time should greater than 10 mins
     const [loading, setLoading] = useState(false)
     const [timeState, setTimeState] = useState(3)
     const [ready, setReady] = useState(false)

@@ -36,10 +36,16 @@ export async function GET(request: NextRequest) {
             );
         }
 
+        const date = new Date();
+        const localeDate = date.toLocaleDateString();
         const entry = user.activeQueues?.find(
-            (q: { businessId: { toString: () => string } }) =>
-                q.businessId.toString() === bid
+            (q: { businessId: { toString: () => string } ,date:string}) =>(
+                q.businessId.toString() === bid &&
+                q.date === localeDate
+            )
         );
+
+        console.log("Entry => "+entry);
 
         // User has no queue entry for this business
         if (!entry) {
@@ -58,8 +64,12 @@ export async function GET(request: NextRequest) {
             );
         }
 
+        console.log("Queue => "+queueStatus);
+        
+        
+
         return NextResponse.json(
-            { success: true, Joined: queueStatus.JoinedQueue, queueId: queueStatus._id },
+            { success: true, Joined: queueStatus.JoinedQueue, queueId: queueStatus._id ,currentPosition: queueStatus.CurrentPostion},
             { status: 200 }
         );
 

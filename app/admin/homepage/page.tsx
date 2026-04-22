@@ -64,10 +64,10 @@ const Page = () => {
                         data!.length===0?
                         <></>
                         :data!.map((d:Data)=>(
-                            <div key={d._id} className='text-white font-thin gap-2 flex flex-col justify-center items-start  p-4 rounded-md bg-gradient-to-l from-green-700 to-green-900'>
+                            <Link href={`/admin/homepage/${d._id}`} key={d._id} className='text-white font-thin gap-2 flex flex-col justify-center items-start  p-4 rounded-md bg-gradient-to-l from-green-700 to-green-900'>
                                 <p className='text-xl'>{d.BusinessName}</p>
                                 <p className='text-[15px]'>{d.BusinessAddress}</p>
-                            </div>
+                            </Link>
                         ))
                     }
                     <Link href={"/admin/addBusiness/businessInfo"} className='grid grid-col-1 justify-center item-center  p-4 rounded-md bg-gradient-to-l from-gray-200 to-gray-300'>

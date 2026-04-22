@@ -11,7 +11,6 @@ const ServiceModal = new mongoose.Schema({
     AvgDurationPerCustomer:{
         type:Number
     },
-
     ChargesPerService:{
         type:Number
     }

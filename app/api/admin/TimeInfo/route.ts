@@ -10,7 +10,7 @@ export async function POST(request:NextRequest){
     try {
         const {bid,BusinessStartTime,BusinessEndTime,CustomerLimitPerDay,AdditionalInformation} = await request.json();
 
-        if(!BusinessStartTime || !BusinessEndTime ||!CustomerLimitPerDay ||!AdditionalInformation){
+        if(!BusinessStartTime || !BusinessEndTime ||!CustomerLimitPerDay){
             return NextResponse.json(
                 {error:"Empty Fields"},
                 {status:404}

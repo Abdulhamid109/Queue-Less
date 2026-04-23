@@ -42,6 +42,7 @@ const Cust_navbar = () => {
           {session&&<Link href={"/profile"} className='list-none  hover:underline'>Profile</Link>}
             <li className='list-none  hover:underline'>About us</li>
             <li className='list-none  hover:underline'>Contact</li>
+            <Link href={"/SFeedback"} className='list-none  hover:underline'>Feedback</Link>
             {/* based on the token update the Navbar */}
             {session?<button className='bg-red-500 rounded-md hover:bg-red-600 p-1' onClick={handleLogout}>Logout</button>:<Link href={"/auth/login"} className='list-none  hover:underline'>Login</Link>}
         </div>

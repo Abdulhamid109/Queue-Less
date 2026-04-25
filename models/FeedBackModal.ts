@@ -7,7 +7,11 @@ const FeedBackModal = new mongoose.Schema({
     cid:{
         type:String
     },
-    FeedBackValue:{
+    Title:{
+        type:String,
+        required:true
+    },
+    Description:{
         type:String,
     },
     createdAt:{

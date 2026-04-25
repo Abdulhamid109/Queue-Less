@@ -14,6 +14,12 @@ interface BusinessFormat {
     CustomerLimitPerDay: string;
 }
 
+interface FeedbackFormat {
+    _id: string;
+    Title: string;
+    Description: string;
+}
+
 interface ServiceDetails {
     _id: string;
     name: string;
@@ -35,6 +41,8 @@ const Page = () => {
     const [bookingLoader, setBookingLoader] = useState<boolean>(false);
     const [count, setCount] = useState<number>(0);
     const [showResult, setShowResult] = useState<boolean>(false);
+    const [feedbackData, SetFeedbackData] = useState<FeedbackFormat[]>([])
+    const [secondFeebackLoader, setSecondFeedbackLoader] = useState<boolean>(false);
 
     const FetchBusinessDetails = async () => {
         setBusinessLoader(true)
@@ -94,7 +102,7 @@ const Page = () => {
         } finally {
             setBookingLoader(false);
         }
-    
+
     }
 
     const ViewCancelledBookings = async () => {
@@ -122,7 +130,7 @@ const Page = () => {
         } finally {
             setBookingLoader(false);
         }
-    
+
     }
 
     const ViewCompletedBookings = async () => {
@@ -150,7 +158,7 @@ const Page = () => {
         } finally {
             setBookingLoader(false);
         }
-    
+
     }
 
     //   expense details based on date
@@ -167,17 +175,45 @@ const Page = () => {
 
     }
 
-    // ← added
     const handleCancel = () => {
         setInputDate('');
         setShowResult(false);
         setCount(0);
     }
 
-    useEffect(() => {
-        FetchBusinessDetails();
-    }, [])
+    
 
+    const fetchCustomerFeedbacks = async () => {
+        setSecondFeedbackLoader(true);
+        try {
+            const response = await fetch(`/api/customer/readfeedbacks?id=${id}`, {
+                headers: { 'Content-Type': 'application/json' },
+                method: 'GET'
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.error || "Something went wrong");
+            } else {
+                SetFeedbackData(result.feedbacks);
+            }
+
+        } catch (error) {
+            if (error instanceof Error) {
+                toast.error("Something went wrong!");
+                console.log("Error => " + error);
+            }
+        } finally {
+            setSecondFeedbackLoader(false);
+        }
+    }
+
+
+useEffect(() => {
+        FetchBusinessDetails();
+        fetchCustomerFeedbacks()
+    }, []);
 
     if (businessLoader) {
         return (
@@ -240,7 +276,7 @@ const Page = () => {
                                         )}
                                         <DialogClose asChild>
                                             <button
-                                                onClick={handleCancel} 
+                                                onClick={handleCancel}
                                                 className="bg-red-400 p-2 rounded-md">Cancel</button>
                                         </DialogClose>
                                     </div>
@@ -286,7 +322,7 @@ const Page = () => {
                                         )}
                                         <DialogClose asChild>
                                             <button
-                                                onClick={handleCancel} 
+                                                onClick={handleCancel}
                                                 className="bg-red-400 p-2 rounded-md">Cancel</button>
                                         </DialogClose>
                                     </div>
@@ -332,7 +368,7 @@ const Page = () => {
                                         )}
                                         <DialogClose asChild>
                                             <button
-                                                onClick={handleCancel} 
+                                                onClick={handleCancel}
                                                 className="bg-red-400 p-2 rounded-md">Cancel</button>
                                         </DialogClose>
                                     </div>
@@ -394,9 +430,23 @@ const Page = () => {
                     </h1>
 
                     <div className="p-6 rounded-xl bg-white border border-gray-200 shadow-sm">
-                        <p className="text-gray-500 text-sm">
-                            Feedback insights will appear here
-                        </p>
+                        {
+                            secondFeebackLoader ?
+                                <p className="text-gray-500 text-sm animate-pulse">
+                                    Fetching Your Feedback insights.....
+                                </p> : feedbackData.length === 0 ?
+                                    <p className="text-gray-500 text-sm">
+                                        No Feedbacks at the moment
+                                    </p> : feedbackData.map((d: FeedbackFormat,i:number) => (
+                                        <div
+                                            key={d._id}
+                                            className="text-gray-500 text-sm flex flex-col gap-2 rounded-md border p-2 m-1">
+                                                <p className="font-bold text-xs">user {i+1}</p>
+                                            <p>Title : {d.Title}</p>
+                                            <p>Description : {d.Description}</p>
+                                        </div>
+                                    ))
+                        }
                     </div>
                 </section>
 

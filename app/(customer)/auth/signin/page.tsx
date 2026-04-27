@@ -61,6 +61,8 @@ const Page = () => {
     const searchRef = useRef<HTMLInputElement>(null);
     const [locationLoading, setLocationLoading] = useState(true) // true = fetching
     const [locationGranted, setLocationGranted] = useState(false)
+    const [isClicked, setClicked] = useState<boolean>(false);
+    
 
 
     useEffect(() => {
@@ -166,6 +168,16 @@ const Page = () => {
         }
     }
 
+
+    const isPasswordValid = (password: string): boolean => {
+        return (
+            password.length >= 8 &&
+            /[A-Z]/.test(password) &&
+            /[0-9]/.test(password) &&
+            /[^A-Za-z0-9]/.test(password)
+        );
+    }
+
     if (locationLoading) {
         return (
             <p className="flex justify-center animate-pulse text-xl text-center items-center min-h-screen">
@@ -226,15 +238,60 @@ const Page = () => {
                     </div>
 
                     <div className="flex flex-col gap-1">
-                        <label className="text-sm text-gray-600">Password</label>
+                                                <label className="text-sm text-gray-600">Password</label>
+
                         <input
-                            type="password"
+                            type={isClicked ? "text" : "password"}
                             placeholder="Enter your password"
-                            required
                             value={data?.password}
-                            onChange={(e) => setdata({ ...data!, password: e.target.value })}
-                            className="p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                            onChange={(e) => {
+                                setdata({ ...data!, password: e.target.value })
+                            }}
+                            required
+                            className={`p-3 rounded-lg border focus:outline-none focus:ring-2 transition
+            ${data?.password && data.password.length < 8
+                                    ? "border-red-400 focus:ring-red-400"
+                                    : data?.password && data.password.length >= 8
+                                        ? "border-green-400 focus:ring-green-500"
+                                        : "border-gray-300 focus:ring-blue-500"
+                                }`}
                         />
+
+                        {/* Validation messages */}
+                        {data?.password && (
+                            <div className="flex justify-between items-center">
+                                <div className="flex flex-col gap-1 text-xs px-1">
+                                <p className={`flex items-center gap-1 ${data.password.length >= 8 ? "text-green-500" : "text-red-400"}`}>
+                                    {data.password.length >= 8 ? "✓" : "✗"} At least 8 characters
+                                </p>
+                                <p className={`flex items-center gap-1 ${/[A-Z]/.test(data.password) ? "text-green-500" : "text-red-400"}`}>
+                                    {/[A-Z]/.test(data.password) ? "✓" : "✗"} At least one uppercase letter
+                                </p>
+                                <p className={`flex items-center gap-1 ${/[0-9]/.test(data.password) ? "text-green-500" : "text-red-400"}`}>
+                                    {/[0-9]/.test(data.password) ? "✓" : "✗"} At least one number
+                                </p>
+                                <p className={`flex items-center gap-1 ${/[^A-Za-z0-9]/.test(data.password) ? "text-green-500" : "text-red-400"}`}>
+                                    {/[^A-Za-z0-9]/.test(data.password) ? "✓" : "✗"} At least one special character
+                                </p>
+                            </div>
+                            <div className="flex justify-between items-center text-xs">
+                        <div className="flex justify-center items-center gap-1">
+                            <input
+                                type="checkbox"
+                                id="showPassword"
+                                checked={isClicked}
+                                onChange={() => setClicked(prev => !prev)}
+                                className="p-1 cursor-pointer"
+
+                            />
+                            <label htmlFor="showPassword" className="cursor-pointer">
+                                Show Password
+                            </label>
+                        </div>
+
+                    </div>
+                            </div>
+                        )}
                     </div>
 
                     <div className="flex flex-col gap-1">
@@ -334,18 +391,15 @@ const Page = () => {
                         </Dialog>
                     </div>
 
-                    {
-                        loading ?
-                            <button disabled className="mt-2 w-full bg-gray-600 text-white py-3 rounded-lg font-medium  transition duration-200">
-                                Loading...
-                            </button>
-                            : <button
+                    <button
+                                            disabled={!isPasswordValid(data?.password || '') && loading}
+
                                 type="submit"
                                 className="mt-2 w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition duration-200"
                             >
-                                signup
+                                {loading?"loading...":"signup"}
                             </button>
-                    }
+                    
                 </form>
 
                 <p className="text-center text-sm text-gray-500 mt-6">

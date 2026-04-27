@@ -29,87 +29,111 @@ const Cust_navbar = () => {
     }
   }
 
+  const navLinks = [
+    { href: '/aboutus', label: 'About' },
+    { href: '/contact', label: 'Contact' },
+    { href: '/SFeedback', label: 'Feedback' },
+  ]
+
   return (
-    <nav className="w-full px-4 py-3 flex justify-between items-center backdrop-blur-2xl shadow-xl bg-white/70">
-      
-      <Link href={session ? "/homepage" : "/"} className="text-xl md:text-2xl font-semibold">
-        Queue-Less
+    <nav className="w-full px-6 py-3.5 flex justify-between items-center bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50">
+
+      <Link
+        href={session ? "/homepage" : "/"}
+        className="text-lg font-semibold text-gray-900 tracking-tight"
+      >
+        Queue<span className="text-blue-600">Less</span>
       </Link>
 
-      <div className="hidden md:flex items-center gap-6">
+      {/* Desktop Links */}
+      <div className="hidden md:flex items-center gap-1">
         {session && (
-          <Link href="/profile" className="hover:text-blue-600 transition">
+          <Link
+            href="/profile"
+            className="text-sm text-gray-500 hover:text-gray-900 px-3 py-1.5 rounded-md hover:bg-gray-100 transition-colors"
+          >
             Profile
           </Link>
         )}
 
-        <Link href="#" className="hover:text-blue-600 transition">
-          About
-        </Link>
+        {navLinks.map((link) => (
+          <Link
+            key={link.href}
+            href={link.href}
+            className="text-sm text-gray-500 hover:text-gray-900 px-3 py-1.5 rounded-md hover:bg-gray-100 transition-colors"
+          >
+            {link.label}
+          </Link>
+        ))}
 
-        <Link href="#" className="hover:text-blue-600 transition">
-          Contact
-        </Link>
-
-        <Link href="/SFeedback" className="hover:text-blue-600 transition">
-          Feedback
-        </Link>
+        <div className="w-px h-4 bg-gray-200 mx-2" />
 
         {session ? (
           <button
             onClick={handleLogout}
-            className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition"
+            className="text-sm text-red-500 hover:text-red-600 px-3 py-1.5 rounded-md hover:bg-red-50 transition-colors"
           >
             Logout
           </button>
         ) : (
-          <Link href="/auth/login" className="hover:text-blue-600">
+          <Link
+            href="/auth/login"
+            className="text-sm font-medium bg-gray-900 text-white px-4 py-1.5 rounded-lg hover:bg-gray-700 transition-colors"
+          >
             Login
           </Link>
         )}
       </div>
 
+      {/* Mobile Toggle */}
       <button
-        className="md:hidden flex flex-col gap-1"
+        className="md:hidden p-1.5 rounded-md hover:bg-gray-100 transition-colors text-gray-600"
         onClick={() => setMenuOpen(!menuOpen)}
+        aria-label="Toggle menu"
       >
-        {menuOpen?<><X/></>:<><Menu/></>}
+        {menuOpen ? <X size={20} /> : <Menu size={20} />}
       </button>
 
       {/* Mobile Menu */}
       {menuOpen && (
-        <div className="absolute top-14 left-0 w-full bg-white shadow-md flex flex-col items-center gap-4 py-4 md:hidden z-50">
-          
+        <div className="absolute top-full left-0 w-full bg-white border-b border-gray-100 shadow-sm flex flex-col items-start gap-1 px-4 py-3 md:hidden z-50">
+
           {session && (
-            <Link href="/profile" onClick={() => setMenuOpen(false)}>
+            <Link
+              href="/profile"
+              onClick={() => setMenuOpen(false)}
+              className="w-full text-sm text-gray-600 px-3 py-2 rounded-md hover:bg-gray-100 transition-colors"
+            >
               Profile
             </Link>
           )}
 
-          <Link href="#" onClick={() => setMenuOpen(false)}>
-            About
-          </Link>
+          {navLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              onClick={() => setMenuOpen(false)}
+              className="w-full text-sm text-gray-600 px-3 py-2 rounded-md hover:bg-gray-100 transition-colors"
+            >
+              {link.label}
+            </Link>
+          ))}
 
-          <Link href="#" onClick={() => setMenuOpen(false)}>
-            Contact
-          </Link>
-
-          <Link href="/SFeedback" onClick={() => setMenuOpen(false)}>
-            Feedback
-          </Link>
+          <div className="w-full h-px bg-gray-100 my-1" />
 
           {session ? (
             <button
-              onClick={() => {
-                handleLogout()
-                setMenuOpen(false)
-              }}
-              className="bg-red-500 text-white px-4 py-1 rounded-md"
+              onClick={() => { handleLogout(); setMenuOpen(false) }}
+              className="w-full text-left text-sm text-red-500 px-3 py-2 rounded-md hover:bg-red-50 transition-colors"
             >
               Logout
             </button>
           ) : (
-            <Link href="/auth/login" onClick={() => setMenuOpen(false)}>
+            <Link
+              href="/auth/login"
+              onClick={() => setMenuOpen(false)}
+              className="w-full text-sm font-medium text-center bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
+            >
               Login
             </Link>
           )}

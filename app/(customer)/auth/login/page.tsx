@@ -5,54 +5,60 @@ import React, { useState } from "react";
 import toast from "react-hot-toast";
 
 
-interface dataFormat{
-    email:string;
-    password:string;
+interface dataFormat {
+    email: string;
+    password: string;
 }
 
 const Page = () => {
-    const [data,setData] = useState<dataFormat|null>(null);
-    const [loading,setLoading] = useState<boolean>(false);
+    const [data, setData] = useState<dataFormat | null>(null);
+    const [loading, setLoading] = useState<boolean>(false);
     const router = useRouter();
+    const [isClicked, setClicked] = useState<boolean>(false);
 
-const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
+    const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setLoading(true);
 
-    try {
-        const response = await fetch('/api/customer/auth/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        });
+        try {
+            const response = await fetch('/api/customer/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
 
-        const result = await response.json();
+            const result = await response.json();
 
-        if (!response.ok) {
-            throw new Error(result.error || "Login failed");
+            if (!response.ok) {
+                throw new Error(result.error || "Login failed");
+            }
+
+            toast.success("Successfully logged in!");
+            router.push('/homepage');
+
+        } catch (error) {
+            console.log("Error => ", error);
+
+            if (error instanceof Error) {
+                toast.error(error.message);
+            } else {
+                toast.error("Unexpected error occurred");
+            }
+
+        } finally {
+            setLoading(false);
         }
+    };
 
-        toast.success("Successfully logged in!");
-        router.push('/homepage');
 
-    } catch (error) {
-        console.log("Error => ", error);
+    const showPassword = () => {
 
-        if (error instanceof Error) {
-            toast.error(error.message);
-        } else {
-            toast.error("Unexpected error occurred");
-        }
-
-    } finally {
-        setLoading(false);
     }
-};
-    
-    
-    
+
+
+
     return (
         <div className="min-h-screen w-full flex items-center justify-center bg-gray-100 font-sans p-3">
             <div className="w-full max-w-md bg-white shadow-lg rounded-2xl p-8">
@@ -73,7 +79,7 @@ const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
                             type="email"
                             placeholder="Enter your email"
                             value={data?.email}
-                            onChange={(e)=>setData({...data!,email:e.target.value})}
+                            onChange={(e) => setData({ ...data!, email: e.target.value })}
                             required
                             className="p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
                         />
@@ -82,32 +88,46 @@ const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
                     <div className="flex flex-col gap-1">
                         <label className="text-sm text-gray-600">Password</label>
                         <input
-                            type="password"
+                            type={isClicked ? "text":"password"}
                             placeholder="Enter your password"
                             value={data?.password}
                             onChange={
-                                (e)=>{
-                                    setData({...data!,password:e.target.value})}
+                                (e) => {
+                                    setData({ ...data!, password: e.target.value })
+                                }
                             }
                             required
                             className="p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
                         />
                     </div>
                     <div className="flex justify-between items-center text-xs">
-                        <li className="list-none">show password</li>
+                        <div className="flex justify-center items-center gap-1">
+                            <input
+                                type="checkbox"
+                                id="showPassword"
+                                checked={isClicked}
+                                onChange={() => setClicked(prev => !prev)}
+                                className="p-1 cursor-pointer"
+                                
+                            />
+                            <label htmlFor="showPassword" className="cursor-pointer">
+                                Show Password
+                            </label>
+                        </div>
+
                         <li className="list-none">Forget Password</li>
                     </div>
                     {
-                        loading?
-                        <button disabled className="mt-2 w-full bg-gray-600 text-white py-3 rounded-lg font-medium  transition duration-200">
-                            Loading...
-                        </button>
-                        :<button
-                        type="submit"
-                        className="mt-2 w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition duration-200"
-                    >
-                        Login
-                    </button>
+                        loading ?
+                            <button disabled className="mt-2 w-full bg-gray-600 text-white py-3 rounded-lg font-medium  transition duration-200">
+                                Loading...
+                            </button>
+                            : <button
+                                type="submit"
+                                className="mt-2 w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition duration-200"
+                            >
+                                Login
+                            </button>
                     }
                 </form>
 

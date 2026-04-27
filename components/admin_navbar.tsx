@@ -47,13 +47,10 @@ const Admin_navbar = () => {
           Profile
         </Link>
 
-        <Link href="/admin/Reports" className="hover:underline">
-          Reports
-        </Link>
 
-        <Link href="/admin/feedbacks" className="hover:underline">
-          Feedbacks
-        </Link>
+        <Link href="#" onClick={() => setMenuOpen(false)}>
+            Pricing (free tier based on days)
+          </Link>
 
         {session && (
           <button
@@ -83,13 +80,11 @@ const Admin_navbar = () => {
             Profile
           </Link>
 
-          <Link href="/admin/Reports" onClick={() => setMenuOpen(false)}>
-            Reports
+          <Link href="#" onClick={() => setMenuOpen(false)}>
+            Pricing (free tier based on days)
           </Link>
 
-          <Link href="/admin/feedbacks" onClick={() => setMenuOpen(false)}>
-            Feedbacks
-          </Link>
+
 
           {session && (
             <button

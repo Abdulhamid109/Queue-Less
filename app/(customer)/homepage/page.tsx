@@ -28,7 +28,7 @@ const categories = [
     {
         label: "Explore All",
         sub: "Browse all business categories",
-        href: "/allbusiness",
+        href: "#",
         icon: LayoutGrid,
         bg: "bg-gray-50",
         iconColor: "text-gray-500",
@@ -39,7 +39,33 @@ const categories = [
 const Page = () => {
     const [locationCheck, setLocationCheck] = useState<boolean>(false);
     const [locationLoading, setLocationLoading] = useState<boolean>(false);
+    const [name,setName] = useState<string>('Tony stark');
+    const [address,setAddress] = useState<string>('Malabu Point');
     const router = useRouter();
+
+
+
+    const fetchCurrentProfileDetails = async()=>{
+        try {
+            const response = await fetch("/api/customer/profile",{
+                headers:{'Content-Type':'application/json'},
+                method:"GET"
+            });
+
+            const result = await response.json();
+
+            if(!response.ok){
+                throw new Error(result.error || "Something went wrong!");
+            }else{
+                setAddress(result.profile.CustomerAddress)
+                setName(result.profile.name)
+            }
+        } catch (error) {
+            if(error instanceof Error){
+                console.log("Failed to fetch the Profile Details");
+            }
+        }
+    }
 
     useEffect(() => {
         const fetchCurrentLocation = async () => {
@@ -64,6 +90,8 @@ const Page = () => {
                 setLocationLoading(false);
             }
         }
+
+        fetchCurrentProfileDetails();
 
         fetchCurrentLocation();
     }, [])
@@ -108,11 +136,11 @@ const Page = () => {
                                 Welcome back
                             </p>
                             <h1 className="text-3xl md:text-4xl font-semibold text-gray-900 leading-tight">
-                                Tony Stark
+                                {name}
                             </h1>
                             <div className="flex items-center gap-1.5 mt-2">
                                 <MapPin size={13} className="text-green-500" />
-                                <p className="text-sm font-light text-gray-500">Location detected</p>
+                                <p className="text-sm font-light text-gray-500 line-clamp-1">{address}</p>
                             </div>
                         </div>
 
@@ -130,7 +158,6 @@ const Page = () => {
                                 <option value="">Select a category</option>
                                 <option value="HairSaloons">Hair Saloons</option>
                                 <option value="Clinics">Clinics</option>
-                                <option value="other">Other</option>
                             </select>
                         </div>
                     </section>

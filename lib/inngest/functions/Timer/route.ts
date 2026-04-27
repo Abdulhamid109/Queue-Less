@@ -68,7 +68,7 @@ export const SlotTime = inngest.createFunction(
                 if (result.notify) {
                     shouldNotify = true;
                 } else {
-                    await step.sleep(`poll-sleep-${pollCount}`, '1m');
+                    await step.sleep(`poll-sleep-${pollCount}`, '10m');
                 }
 
                 pollCount++;
@@ -102,7 +102,7 @@ export const SlotTime = inngest.createFunction(
 
             if (isNearby) {
                 await step.run('slot-started', async (): Promise<{ status?: string }> => {
-                    console.log("Make a DB query to indicate the slot has started");
+                    console.log("Make a DB query to indicate the slot has started after the slot is over make it success(When the Slot of second user starts)");
                     return { status: "slot-started" }
                 })
             } else {

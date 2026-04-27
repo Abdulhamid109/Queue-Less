@@ -1,15 +1,13 @@
-// fetching the bookings based on the date
-
 import { connect } from "@/config/dbconfig";
 import { GETADMINTOKENDATA } from "@/helpers/getAdminTokenData";
 import { isCheckTime } from "@/helpers/TimeCheck";
-import business from "@/models/BusinessModal";
 import queue from "@/models/QueueModal";
+import service from "@/models/serviceModal";
 import BusinessTime from "@/models/TimeModal";
 import { NextRequest, NextResponse } from "next/server";
 
-connect();
 
+connect();
 
 export async function POST(request: NextRequest) {
     try {
@@ -23,12 +21,14 @@ export async function POST(request: NextRequest) {
                 { status: 401 }
             )
         }
+
         if (inputDate === '' || !inputDate || inputDate == null) {
             return NextResponse.json(
                 { error: "Kindly select the date" },
                 { status: 404 }
             )
         }
+
         console.log("BID => " + bid)
         const BusinessTimeDetails = await BusinessTime.findOne({ BusinessID: bid });
         console.log("BET" + BusinessTimeDetails)
@@ -53,17 +53,27 @@ export async function POST(request: NextRequest) {
         const formattedDate = date.toLocaleDateString();
 
         console.log("Formatted date for query:", formattedDate);
+        const AllQueues = await queue.find({ businessId: bid, date: formattedDate, JoinedQueue: true });
+        console.log("TotalQueues => " + AllQueues.length)
 
+        const allServiceIds = AllQueues.flatMap((d) => d.ServiceId);
+        const allServices = await Promise.all(
+            allServiceIds.map((e: string) => service.findById(e))
+        );
+        const totalExpense = allServices.reduce((acc, serviceDB) => {
+            if (!serviceDB) return acc;
+            return acc + (serviceDB.ChargesPerService || 0);
+        }, 0);
 
-        const QueueRecords = await queue.countDocuments({
-            date: formattedDate,
-            businessId: bid
-        });
-        console.log("REcords count " + QueueRecords)
+        console.log("Total Expense for " + formattedDate + " is " + totalExpense);
+
         return NextResponse.json(
-            { success: true, count: QueueRecords },
+            { success: true, expense: totalExpense },
             { status: 200 }
+
         )
+
+
 
     } catch (error) {
         console.log("Error => " + error);

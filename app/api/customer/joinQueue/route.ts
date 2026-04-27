@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 import customer from "@/models/CustomerModal";
 import service from "@/models/serviceModal";
 import { inngest } from "@/lib/inngest/client";
+import BusinessTime from "@/models/TimeModal";
 
 
 connect();
@@ -25,6 +26,9 @@ export async function POST(request: NextRequest) {
         }
         const Datee = new Date();
         const localeDate = Datee.toLocaleDateString();
+        const TimeDb = await BusinessTime.findOne({ BusinessID: businessId });
+
+
         const UserDB = await customer.findById(uid);
         console.log("Bid => " + businessId)
         const entry = UserDB.activeQueues?.find(
@@ -71,6 +75,31 @@ export async function POST(request: NextRequest) {
         const postion = countAhead + 1;
         console.log("Current Users postion in the Queue" + postion);
 
+        // if the current users postion is surpassing the totalcustomerlimit then done for the day
+        if (postion >= TimeDb.CustomerLimitPerDay) {
+            return NextResponse.json(
+                { error: "Unable to book ,Customer limit exceeds" },
+                { status: 402 }
+            )
+        }
+
+        // if the current time is greator than the BET then user cannot book the slot
+        const now = new Date();
+        const hr = now.getHours().toString().padStart(2, '0');
+        const min = now.getMinutes().toString().padStart(2, '0');
+
+        const [dbHr, dbMin] = TimeDb.BET.split(':');
+
+        const currentMins = parseInt(hr) * 60 + parseInt(min);
+        const dbMins = parseInt(dbHr) * 60 + parseInt(dbMin);
+
+        if (currentMins > dbMins) {
+            return NextResponse.json(
+                { error: "Slot cannot be booked as the shop is closed!" },
+                { status: 403 }
+            );
+        }
+
 
 
 
@@ -110,9 +139,10 @@ export async function POST(request: NextRequest) {
 
 
 
-        
+
         console.log("Estimated Waiting Time (in mins) => " + TotalTime);
         console.log("Expected Start Time (in mins) => " + expectedSt);
+
 
         const newQueueJoinee = new queue({
             UserId: uid,
@@ -148,14 +178,19 @@ export async function POST(request: NextRequest) {
 
         const savedQueue = await newQueueJoinee.save();
 
+
+
+
+
+
         // calling our inngest event
         await inngest.send(
             {
                 name: "slot/StartTime",
                 data: {
                     uid,
-                    bid:businessId,
-                    queueId:savedQueue._id
+                    bid: businessId,
+                    queueId: savedQueue._id
                 }
             }
         )

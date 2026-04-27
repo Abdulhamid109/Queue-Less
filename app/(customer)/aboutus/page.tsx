@@ -37,7 +37,7 @@ const stats = [
 ];
 
 const team = [
-    { initials: "Ab", name: "You (Founder)", role: "Product & Engineering", bg: "#E6F1FB", color: "#0C447C" },
+    { initials: "Ab", name: "Abdulhamid (Founder)", role: "Product & Engineering", bg: "#E6F1FB", color: "#0C447C" },
     { initials: "QL", name: "Queueless Labs", role: "Research & Infrastructure", bg: "#E1F5EE", color: "#085041" },
 ];
 

@@ -43,6 +43,8 @@ const Page = () => {
     const [showResult, setShowResult] = useState<boolean>(false);
     const [feedbackData, SetFeedbackData] = useState<FeedbackFormat[]>([])
     const [secondFeebackLoader, setSecondFeedbackLoader] = useState<boolean>(false);
+    const [Expense,setExpense] = useState<string>('');
+    const [expenseLoader,setExpenseLoader] = useState<boolean>(false);
 
     const FetchBusinessDetails = async () => {
         setBusinessLoader(true)
@@ -164,17 +166,37 @@ const Page = () => {
     //   expense details based on date
 
     const CalculatingExpenseDetails = async () => {
+        setExpenseLoader(true);
         // total customer successfully completed service along with total price
+        try {
+            const response = await fetch(`/api/admin/expensedetails?id=${id}`,{
+                headers:{'Content-Type':'application/json'},
+                method:'POST',
+                body:JSON.stringify(inputDate)
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.error || "Something went wrong!")
+            } else {
+                console.log("Total Expense displayed!"+result.expense);
+                setExpense(result.expense);
+                setShowResult(true);
+            }
+        } catch (error) {
+            console.log("Error => "+error);
+            if(error instanceof Error){
+                toast.error(error.message);
+            }
+        }finally{
+            setExpenseLoader(false);
+        }
     }
 
     //   total queue's successfull vs failure
 
     //  Customer Feedback for the business
-
-    const GetCustomersFeedback = async () => {
-
-    }
-
     const handleCancel = () => {
         setInputDate('');
         setShowResult(false);
@@ -255,7 +277,9 @@ useEffect(() => {
                                         {/* ← changed from !count to showResult flag */}
                                         {!showResult ? (
                                             <>
-                                                <input type="date" className="flex justify-center items-center min-w-full focus:outline border p-2 rounded-md" onChange={(e) => setInputDate(e.target.value)} />
+                                                <input type="date"
+                                                max={new Date().toISOString().split("T")[0]}
+                                                className="flex justify-center items-center min-w-full focus:outline border p-2 rounded-md" onChange={(e) => setInputDate(e.target.value)} />
                                                 <p className="p-2 text-center">Selected Date : {inputDate}</p>
                                             </>
                                         ) : (
@@ -301,7 +325,9 @@ useEffect(() => {
                                         {/* ← changed from !count to showResult flag */}
                                         {!showResult ? (
                                             <>
-                                                <input type="date" className="flex justify-center items-center min-w-full focus:outline border p-2 rounded-md" onChange={(e) => setInputDate(e.target.value)} />
+                                                <input type="date" 
+                                                max={new Date().toISOString().split("T")[0]}
+                                                className="flex justify-center items-center min-w-full focus:outline border p-2 rounded-md" onChange={(e) => setInputDate(e.target.value)} />
                                                 <p className="p-2 text-center">Selected Date : {inputDate}</p>
                                             </>
                                         ) : (
@@ -347,7 +373,9 @@ useEffect(() => {
                                         {/* ← changed from !count to showResult flag */}
                                         {!showResult ? (
                                             <>
-                                                <input type="date" className="flex justify-center items-center min-w-full focus:outline border p-2 rounded-md" onChange={(e) => setInputDate(e.target.value)} />
+                                                <input type="date" 
+                                                max={new Date().toISOString().split("T")[0]}
+                                                className="flex justify-center items-center min-w-full focus:outline border p-2 rounded-md" onChange={(e) => setInputDate(e.target.value)} />
                                                 <p className="p-2 text-center">Selected Date : {inputDate}</p>
                                             </>
                                         ) : (
@@ -410,17 +438,59 @@ useEffect(() => {
                     </h1>
 
                     <div className="grid md:grid-cols-2 gap-6">
-                        {[
-                            "Calculate the expense details",
-                            "Graphical Interpretation of Queue",
-                        ].map((item, i) => (
+                        
+                            <Dialog>
+                            <DialogTrigger>
+                                <div
+                                    className="p-5 rounded-xl bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 cursor-pointer">
+                                    <p className="text-lg font-medium text-gray-700">Calculate the expense details</p>
+                                </div>
+                            </DialogTrigger>
+                            <DialogContent
+                                onInteractOutside={(e) => e.preventDefault()}
+                                showCloseButton={false}
+                            >
+                                <DialogHeader className="text-center">Select Date</DialogHeader>
+                                <DialogDescription>
+                                    <div className="flex flex-col gap-2">
+                                        {!showResult ? (
+                                            <>
+                                                <input type="date" 
+                                                max={new Date().toISOString().split("T")[0]}
+                                                className="flex justify-center items-center min-w-full focus:outline border p-2 rounded-md" onChange={(e) => setInputDate(e.target.value)} />
+                                                <p className="p-2 text-center">Selected Date : {inputDate}</p>
+                                            </>
+                                        ) : (
+                                            <div className="text-center py-4 text-gray-800 text-lg">
+                                                Total Expense Generated: <span className="font-bold">{Expense}</span>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                </DialogDescription>
+                                <DialogFooter>
+                                    <div className="text-white flex justify-between items-center min-w-full text-center">
+                                        {(inputDate !== '' && !showResult) && (
+                                            <button className="bg-blue-500 rounded-md p-2" disabled={expenseLoader} onClick={CalculatingExpenseDetails}>
+                                                {expenseLoader ? "loading.." : "Next"}
+                                            </button>
+                                        )}
+                                        <DialogClose asChild>
+                                            <button
+                                                onClick={handleCancel}
+                                                className="bg-red-400 p-2 rounded-md">Cancel</button>
+                                        </DialogClose>
+                                    </div>
+                                </DialogFooter>
+                            </DialogContent>
+                        </Dialog>
+
                             <div
-                                key={i}
                                 className="p-5 rounded-xl bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 cursor-pointer"
                             >
-                                <p className="text-lg font-medium text-gray-700">{item}</p>
+                                <p className="text-lg font-medium text-gray-700">Graphical Representation of Queue</p>
                             </div>
-                        ))}
+                        
                     </div>
                 </section>
 

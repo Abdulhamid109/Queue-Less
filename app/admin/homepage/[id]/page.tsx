@@ -1,6 +1,8 @@
 "use client";
 import Admin_navbar from "@/components/admin_navbar";
+import { QueueGraphDialog } from "@/components/Queuegraphdialog";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTrigger } from "@/components/ui/dialog";
+import Link from "next/link";
 import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -43,8 +45,8 @@ const Page = () => {
     const [showResult, setShowResult] = useState<boolean>(false);
     const [feedbackData, SetFeedbackData] = useState<FeedbackFormat[]>([])
     const [secondFeebackLoader, setSecondFeedbackLoader] = useState<boolean>(false);
-    const [Expense,setExpense] = useState<string>('');
-    const [expenseLoader,setExpenseLoader] = useState<boolean>(false);
+    const [Expense, setExpense] = useState<string>('');
+    const [expenseLoader, setExpenseLoader] = useState<boolean>(false);
 
     const FetchBusinessDetails = async () => {
         setBusinessLoader(true)
@@ -169,10 +171,10 @@ const Page = () => {
         setExpenseLoader(true);
         // total customer successfully completed service along with total price
         try {
-            const response = await fetch(`/api/admin/expensedetails?id=${id}`,{
-                headers:{'Content-Type':'application/json'},
-                method:'POST',
-                body:JSON.stringify(inputDate)
+            const response = await fetch(`/api/admin/expensedetails?id=${id}`, {
+                headers: { 'Content-Type': 'application/json' },
+                method: 'POST',
+                body: JSON.stringify(inputDate)
             });
 
             const result = await response.json();
@@ -180,16 +182,16 @@ const Page = () => {
             if (!response.ok) {
                 throw new Error(result.error || "Something went wrong!")
             } else {
-                console.log("Total Expense displayed!"+result.expense);
+                console.log("Total Expense displayed!" + result.expense);
                 setExpense(result.expense);
                 setShowResult(true);
             }
         } catch (error) {
-            console.log("Error => "+error);
-            if(error instanceof Error){
+            console.log("Error => " + error);
+            if (error instanceof Error) {
                 toast.error(error.message);
             }
-        }finally{
+        } finally {
             setExpenseLoader(false);
         }
     }
@@ -203,7 +205,7 @@ const Page = () => {
         setCount(0);
     }
 
-    
+
 
     const fetchCustomerFeedbacks = async () => {
         setSecondFeedbackLoader(true);
@@ -232,7 +234,7 @@ const Page = () => {
     }
 
 
-useEffect(() => {
+    useEffect(() => {
         FetchBusinessDetails();
         fetchCustomerFeedbacks()
     }, []);
@@ -253,13 +255,16 @@ useEffect(() => {
             <main className="max-w-7xl mx-auto px-6 py-8 space-y-10">
 
                 <section className="space-y-4">
-                    <h1 className="text-3xl md:text-4xl font-semibold bg-gradient-to-r from-gray-700 to-gray-400 text-transparent bg-clip-text">
+                    <div className="flex justify-between items-center">
+                        <h1 className="text-3xl md:text-4xl font-semibold bg-gradient-to-r from-gray-700 to-gray-400 text-transparent bg-clip-text">
                         Admin Options
                     </h1>
+                    <Link href={`/admin/slotMembers?bid=${id}`} className="hover:underline bg-slate-100 hover:bg-slate-200 text-slate-700 p-1 rounded-md">
+                    View Bookings
+                    </Link>
+                    </div>
 
                     <div className="grid md:grid-cols-3 gap-6">
-
-
                         <Dialog>
                             <DialogTrigger>
                                 <div
@@ -278,8 +283,8 @@ useEffect(() => {
                                         {!showResult ? (
                                             <>
                                                 <input type="date"
-                                                max={new Date().toISOString().split("T")[0]}
-                                                className="flex justify-center items-center min-w-full focus:outline border p-2 rounded-md" onChange={(e) => setInputDate(e.target.value)} />
+                                                    max={new Date().toISOString().split("T")[0]}
+                                                    className="flex justify-center items-center min-w-full focus:outline border p-2 rounded-md" onChange={(e) => setInputDate(e.target.value)} />
                                                 <p className="p-2 text-center">Selected Date : {inputDate}</p>
                                             </>
                                         ) : (
@@ -325,9 +330,9 @@ useEffect(() => {
                                         {/* ← changed from !count to showResult flag */}
                                         {!showResult ? (
                                             <>
-                                                <input type="date" 
-                                                max={new Date().toISOString().split("T")[0]}
-                                                className="flex justify-center items-center min-w-full focus:outline border p-2 rounded-md" onChange={(e) => setInputDate(e.target.value)} />
+                                                <input type="date"
+                                                    max={new Date().toISOString().split("T")[0]}
+                                                    className="flex justify-center items-center min-w-full focus:outline border p-2 rounded-md" onChange={(e) => setInputDate(e.target.value)} />
                                                 <p className="p-2 text-center">Selected Date : {inputDate}</p>
                                             </>
                                         ) : (
@@ -373,9 +378,9 @@ useEffect(() => {
                                         {/* ← changed from !count to showResult flag */}
                                         {!showResult ? (
                                             <>
-                                                <input type="date" 
-                                                max={new Date().toISOString().split("T")[0]}
-                                                className="flex justify-center items-center min-w-full focus:outline border p-2 rounded-md" onChange={(e) => setInputDate(e.target.value)} />
+                                                <input type="date"
+                                                    max={new Date().toISOString().split("T")[0]}
+                                                    className="flex justify-center items-center min-w-full focus:outline border p-2 rounded-md" onChange={(e) => setInputDate(e.target.value)} />
                                                 <p className="p-2 text-center">Selected Date : {inputDate}</p>
                                             </>
                                         ) : (
@@ -438,8 +443,8 @@ useEffect(() => {
                     </h1>
 
                     <div className="grid md:grid-cols-2 gap-6">
-                        
-                            <Dialog>
+
+                        <Dialog>
                             <DialogTrigger>
                                 <div
                                     className="p-5 rounded-xl bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 cursor-pointer">
@@ -455,9 +460,9 @@ useEffect(() => {
                                     <div className="flex flex-col gap-2">
                                         {!showResult ? (
                                             <>
-                                                <input type="date" 
-                                                max={new Date().toISOString().split("T")[0]}
-                                                className="flex justify-center items-center min-w-full focus:outline border p-2 rounded-md" onChange={(e) => setInputDate(e.target.value)} />
+                                                <input type="date"
+                                                    max={new Date().toISOString().split("T")[0]}
+                                                    className="flex justify-center items-center min-w-full focus:outline border p-2 rounded-md" onChange={(e) => setInputDate(e.target.value)} />
                                                 <p className="p-2 text-center">Selected Date : {inputDate}</p>
                                             </>
                                         ) : (
@@ -485,12 +490,9 @@ useEffect(() => {
                             </DialogContent>
                         </Dialog>
 
-                            <div
-                                className="p-5 rounded-xl bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 cursor-pointer"
-                            >
-                                <p className="text-lg font-medium text-gray-700">Graphical Representation of Queue</p>
-                            </div>
-                        
+                        {/* <QueueGraphDialog id={id as string} /> */}
+
+
                     </div>
                 </section>
 
@@ -507,11 +509,11 @@ useEffect(() => {
                                 </p> : feedbackData.length === 0 ?
                                     <p className="text-gray-500 text-sm">
                                         No Feedbacks at the moment
-                                    </p> : feedbackData.map((d: FeedbackFormat,i:number) => (
+                                    </p> : feedbackData.map((d: FeedbackFormat, i: number) => (
                                         <div
                                             key={d._id}
                                             className="text-gray-500 text-sm flex flex-col gap-2 rounded-md border p-2 m-1">
-                                                <p className="font-bold text-xs">user {i+1}</p>
+                                            <p className="font-bold text-xs">user {i + 1}</p>
                                             <p>Title : {d.Title}</p>
                                             <p>Description : {d.Description}</p>
                                         </div>

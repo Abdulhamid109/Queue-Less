@@ -102,6 +102,7 @@ export const SlotTime = inngest.createFunction(
 
             if (isNearby) {
                 await step.run('slot-started', async (): Promise<{ status?: string }> => {
+                    // For free tier we can intiate the email and for ppaid we can intiate the calling system(for user)
                     console.log("Make a DB query to indicate the slot has started after the slot is over make it success(When the Slot of second user starts)");
                     return { status: "slot-started" }
                 })

@@ -25,15 +25,15 @@ const categories = [
         iconColor: "text-green-500",
         border: "border-green-100",
     },
-    {
-        label: "Explore All",
-        sub: "Browse all business categories",
-        href: "#",
-        icon: LayoutGrid,
-        bg: "bg-gray-50",
-        iconColor: "text-gray-500",
-        border: "border-gray-200",
-    },
+    // {
+    //     label: "Explore All",
+    //     sub: "Browse all business categories",
+    //     href: "#",
+    //     icon: LayoutGrid,
+    //     bg: "bg-gray-50",
+    //     iconColor: "text-gray-500",
+    //     border: "border-gray-200",
+    // },
 ];
 
 const Page = () => {

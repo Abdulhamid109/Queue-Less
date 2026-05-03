@@ -1,12 +1,11 @@
-import type { Metadata } from "next";
+"use client"
 import Link from "next/link";
 import { Mail, MapPin, Clock, MessageSquare } from "lucide-react";
 import Cust_navbar from "@/components/cust_navbar";
+import { useState } from "react";
+import toast from "react-hot-toast";
 
-export const metadata: Metadata = {
-    title: "Contact | Queueless",
-    description: "Get in touch with the Queueless team. We're here to help.",
-};
+
 
 const contactInfo = [
     {
@@ -58,10 +57,64 @@ const faqs = [
     },
 ];
 
+interface ContactFormat {
+    name: string;
+    email: string;
+    subject: string;
+    message: string
+}
+
 export default function ContactPage() {
+    const [data, setData] = useState<ContactFormat>({
+        name: "",
+        email: "",
+        subject: "",
+        message: ""
+    });
+
+    const [formloader, setFormLoader] = useState<boolean>(false);
+
+
+    const onhandleChnage = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setData(prev => ({ ...prev, [name]: value }));
+    }
+
+    const handleSubmit = async (e: React.SubmitEvent) => {
+        e.preventDefault();
+        setFormLoader(true);
+        try {
+            const response = await fetch("/api/customer/addcontactdetails", {
+                headers: { 'Content-Type': 'application/json' },
+                method: "POST",
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+            if (!response.ok) {
+                throw new Error(result.error || "Something went wrong");
+            } else {
+                setData({
+                    name:"",
+                    email:"",
+                    message:"",
+                    subject:""
+                })
+                toast.success("Thank You, Our team will be reaching to you soon");
+            }
+        } catch (error) {
+            if (error instanceof Error) {
+                console.log("Error => " + error.message);
+                toast.error("Something went wrong")
+
+            }
+        }finally{
+            setFormLoader(false);
+        }
+    }
     return (
         <div className="min-h-screen bg-gray-50 font-sans text-gray-900">
-            <Cust_navbar/>
+            <Cust_navbar />
             {/* Hero */}
             <section className="px-6 md:px-16 py-16 border-b border-gray-200">
                 <span className="inline-block text-xs font-medium tracking-widest uppercase text-blue-600 bg-blue-50 border border-blue-100 px-3 py-1 rounded-full mb-6">
@@ -116,7 +169,7 @@ export default function ContactPage() {
                     We&apos;ll get back to you within a day.
                 </h2>
 
-                <form className="max-w-2xl flex flex-col gap-5">
+                <form onSubmit={handleSubmit} className="max-w-2xl flex flex-col gap-5">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="flex flex-col gap-1.5">
                             <label className="text-xs text-gray-400 font-medium tracking-wide uppercase">
@@ -125,6 +178,9 @@ export default function ContactPage() {
                             <input
                                 type="text"
                                 placeholder="Your full name"
+                                name="name"
+                                onChange={onhandleChnage}
+                                required
                                 className="text-sm border border-gray-200 rounded-lg px-4 py-2.5 bg-white text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-400 transition"
                             />
                         </div>
@@ -134,6 +190,9 @@ export default function ContactPage() {
                             </label>
                             <input
                                 type="email"
+                                name="email"
+                                onChange={onhandleChnage}
+                                required
                                 placeholder="you@example.com"
                                 className="text-sm border border-gray-200 rounded-lg px-4 py-2.5 bg-white text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-400 transition"
                             />
@@ -146,6 +205,9 @@ export default function ContactPage() {
                         </label>
                         <input
                             type="text"
+                            name="subject"
+                            onChange={onhandleChnage}
+                            required
                             placeholder="What's this about?"
                             className="text-sm border border-gray-200 rounded-lg px-4 py-2.5 bg-white text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-400 transition"
                         />
@@ -157,6 +219,9 @@ export default function ContactPage() {
                         </label>
                         <textarea
                             rows={5}
+                            name="message"
+                            onChange={(e)=>setData({...data!,message:e.target.value})}
+                            required
                             placeholder="Tell us what's on your mind..."
                             className="text-sm border border-gray-200 rounded-lg px-4 py-2.5 bg-white text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-400 transition resize-none"
                         />
@@ -165,9 +230,10 @@ export default function ContactPage() {
                     <div className="flex items-center gap-3">
                         <button
                             type="submit"
+                            disabled={formloader}
                             className="bg-gray-900 text-white text-sm font-medium px-6 py-2.5 rounded-lg hover:bg-gray-700 transition-colors"
                         >
-                            Send Message
+                            {formloader?"submitting":"Send Message"}
                         </button>
                         <p className="text-xs text-gray-400 font-light">
                             We don&apos;t share your data with anyone.

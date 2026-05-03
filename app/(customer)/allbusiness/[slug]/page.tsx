@@ -3,7 +3,7 @@ import Cust_navbar from '@/components/cust_navbar';
 import { getLocation } from '@/helpers/getCurrentLocation';
 import Link from 'next/link';
 import { useParams } from 'next/navigation'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast';
 import { MapPin, Search, RefreshCw, Navigation } from 'lucide-react';
 
@@ -21,6 +21,10 @@ const Page = () => {
   const [data, setData] = useState<DataFormat[]>([]);
   const [search, setSearch] = useState<string>('');
   const [radius, setRadius] = useState<string>('');
+  const [latitude,setLatitude] = useState<number>();
+  const [longitude,setLongitude] = useState<number>();
+  const [radiusLoader,setRadiusLoader] = useState<boolean>(false);
+  const radiusRef = useRef<HTMLInputElement>(null);
 
   const fetchingCurrentLocation = async () => {
     const location = await getLocation();
@@ -30,6 +34,8 @@ const Page = () => {
     }
     setLocationGranted(true);
     fetchBusiness(location.coords.latitude, location.coords.longitude);
+    setLatitude(location.coords.latitude);
+    setLongitude(location.coords.longitude);
   }
 
   const fetchBusiness = async (latitude: number, longitude: number) => {
@@ -55,6 +61,33 @@ const Page = () => {
       }
     } finally {
       setLoading(false);
+    }
+  }
+
+  const fetchBusinessBasedOnRadius =async(latitude: number, longitude: number)=>{
+    setRadiusLoader(true);
+    try {
+      const payload = { radius,latitude, longitude };
+      const response = await fetch(`/api/customer/RadiusbasedFetching?slug=${slug}`, {
+        headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.error || "Something went wrong!");
+      } else {
+        setData(result.business);
+        toast.success("Successfully fetched the data");
+        radiusRef.current!.value = ''
+      }
+    } catch (error) {
+      console.log("Error=>" + JSON.stringify(error));
+      if (error instanceof Error) {
+        toast.error(error.message);
+      }
+    }finally{
+      setRadiusLoader(false);
     }
   }
 
@@ -138,7 +171,6 @@ const Page = () => {
 
         <div className="w-full h-px bg-gray-200" />
 
-        {/* Empty state */}
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center gap-5 py-16 text-center">
             <div className="w-12 h-12 bg-gray-100 border border-gray-200 rounded-xl flex items-center justify-center">
@@ -148,24 +180,26 @@ const Page = () => {
               <p className="text-sm font-medium text-gray-900 mb-1">No businesses found nearby</p>
               <p className="text-xs font-light text-gray-500 max-w-xs">
                 Try increasing the search radius to find more results.{' '}
-                <span className="text-blue-500 cursor-pointer hover:underline">Learn more</span>
               </p>
             </div>
             <div className="flex items-center gap-2 w-full max-w-sm">
               <input
                 type="number"
                 value={radius}
+                ref={radiusRef!}
                 onChange={(e) => setRadius(e.target.value)}
                 placeholder="Radius in KM (4 – 10)"
                 className="flex-1 text-sm border border-gray-200 bg-white rounded-lg px-4 py-2.5 text-gray-700 placeholder:text-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-400 transition"
               />
-              <button className="bg-gray-900 text-white text-sm font-medium px-4 py-2.5 rounded-lg hover:bg-gray-700 transition-colors whitespace-nowrap">
-                Search
+              <button 
+              onClick={()=>fetchBusinessBasedOnRadius(latitude!,longitude!)}
+              disabled={radiusLoader}
+              className="bg-gray-900 text-white text-sm font-medium px-4 py-2.5 rounded-lg hover:bg-gray-700 transition-colors whitespace-nowrap">
+                {radiusLoader?<p className='animate-pulse'>Fetching....</p>:"Search"}
               </button>
             </div>
           </div>
         ) : (
-          /* Business Cards */
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
             {filtered.map((d: DataFormat) => (
               <Link
@@ -173,7 +207,6 @@ const Page = () => {
                 key={d._id}
                 className="flex flex-col gap-3 bg-white border border-gray-200 rounded-xl p-5 hover:shadow-sm hover:-translate-y-0.5 transition-all duration-200"
               >
-                {/* Business initial avatar */}
                 <div className="w-9 h-9 rounded-lg bg-green-50 border border-green-100 flex items-center justify-center text-green-600 text-sm font-medium flex-shrink-0">
                   {d.BusinessName.charAt(0).toUpperCase()}
                 </div>

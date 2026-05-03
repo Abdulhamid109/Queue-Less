@@ -1,7 +1,8 @@
 "use client"
 import Cust_navbar from '@/components/cust_navbar';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { BriefcaseBusiness, LocateFixed, LucideEarth, MinusCircle, PersonStanding, PlusCircle, Timer, Clock, Users, Wifi, WifiOff } from 'lucide-react';
+import { getLocation } from '@/helpers/getCurrentLocation';
+import { BriefcaseBusiness, LocateFixed, LucideEarth, MinusCircle, PersonStanding, PlusCircle, Timer, Users,  MapPin } from 'lucide-react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast';
@@ -56,8 +57,20 @@ const Page = () => {
     const [title, setTitle] = useState('')
     const [description, setDescription] = useState('')
     const [FeedbackLoader, setFeedbackLoader] = useState<boolean>(false);
+      const [locationGranted, setLocationGranted] = useState(false);
+    
 
-    const handleSubmit = async (e: React.FormEvent) => {
+      const fetchingCurrentLocation = async () => {
+        const location = await getLocation();
+        if (!location) {
+          setLocationGranted(false);
+          setLoading(false);
+          return;
+        }
+        setLocationGranted(true);
+      }
+
+    const handleSubmit = async (e: React.SubmitEvent) => {
         e.preventDefault();
         setFeedbackLoader(true);
         try {
@@ -84,6 +97,10 @@ const Page = () => {
             setFeedbackLoader(false);
         }
     }
+
+      useEffect(() => {
+        fetchingCurrentLocation();
+      }, [])
 
     // SSE for live queue count
     useEffect(() => {
@@ -240,6 +257,32 @@ const Page = () => {
         );
     }
 
+    if (!locationGranted) {
+        return (
+            <div className="flex justify-center items-center flex-col gap-4 min-h-screen px-6 text-center">
+                <div className="w-12 h-12 bg-red-50 border border-red-100 rounded-xl flex items-center justify-center">
+                    <MapPin size={20} className="text-red-400" />
+                </div>
+                <h2 className="text-base font-medium text-slate-800">Location access blocked</h2>
+                <p className="text-sm text-slate-400 max-w-xs leading-relaxed">
+                    Your browser has blocked location access. To fix this:
+                </p>
+                <ol className="text-sm text-slate-500 text-left max-w-xs space-y-1 list-decimal list-inside">
+                    <li>Click the <strong>lock icon</strong> in your address bar</li>
+                    <li>Set <strong>Location</strong> to <em>Allow</em></li>
+                    <li>Refresh the page</li>
+                </ol>
+                <p>We need location access for fetching the near-by business locations </p>
+                <button
+                    onClick={() => window.location.reload()}
+                    className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium px-5 py-2.5 rounded-xl transition-colors"
+                >
+                    I&apos;ve allowed it — Retry
+                </button>
+            </div>
+        );
+    }
+    
     return (
         <div className="font-sans min-h-screen bg-gray-50">
             <nav className='min-w-full fixed z-50'>

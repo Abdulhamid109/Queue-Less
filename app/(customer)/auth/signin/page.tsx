@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import dynamic from "next/dynamic";
+import { MapPin } from "lucide-react"
 
 const Map = dynamic(() => import("@/components/Map"), { ssr: false });
 
@@ -160,20 +161,30 @@ const Page = () => {
         )
     }
 
-    if (!locationGranted) {
-        return (
-            <div className="flex justify-center items-center flex-col gap-3 min-h-screen">
-                <p className="text-lg">Location permission is required to continue.</p>
-                <button
-                    onClick={() => {router.refresh()}}
-                    className="bg-red-400 hover:bg-red-500 text-white px-4 py-2 rounded-md transition"
-                >
-                    Retry
-                </button>
+if (!locationGranted) {
+    return (
+        <div className="flex justify-center items-center flex-col gap-4 min-h-screen px-6 text-center">
+            <div className="w-12 h-12 bg-red-50 border border-red-100 rounded-xl flex items-center justify-center">
+                <MapPin size={20} className="text-red-400" />
             </div>
-        )
-    }
-
+            <h2 className="text-base font-medium text-slate-800">Location access blocked</h2>
+            <p className="text-sm text-slate-400 max-w-xs leading-relaxed">
+                Your browser has blocked location access. To fix this:
+            </p>
+            <ol className="text-sm text-slate-500 text-left max-w-xs space-y-1 list-decimal list-inside">
+                <li>Click the <strong>lock icon</strong> in your address bar</li>
+                <li>Set <strong>Location</strong> to <em>Allow</em></li>
+                <li>Refresh the page</li>
+            </ol>
+            <button
+                onClick={() => window.location.reload()}
+                className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium px-5 py-2.5 rounded-xl transition-colors"
+            >
+                I&apos;ve allowed it — Retry
+            </button>
+        </div>
+    );
+}
 
 
 
@@ -206,7 +217,7 @@ const Page = () => {
                             placeholder="Enter your email"
                             required
                             value={data?.email}
-                            onChange={(e) => setdata({ ...data!, email: e.target.value })}
+                            onChange={(e) => setdata({ ...data!, email: e.target.value.toLowerCase() })}
                             className="p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
                         />
                     </div>

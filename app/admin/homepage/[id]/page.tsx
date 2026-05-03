@@ -1,6 +1,6 @@
 "use client";
 import Admin_navbar from "@/components/admin_navbar";
-import { QueueGraphDialog } from "@/components/Queuegraphdialog";
+// import { QueueGraphDialog } from "@/components/Queuegraphdialog";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTrigger } from "@/components/ui/dialog";
 import Link from "next/link";
 import { useParams } from "next/navigation";

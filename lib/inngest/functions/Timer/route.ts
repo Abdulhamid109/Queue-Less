@@ -9,6 +9,7 @@ import customer from "@/models/CustomerModal";
 import business from "@/models/BusinessModal";
 import { getDistanceInMeters } from "@/helpers/getDistanceInMeters";
 import service from "@/models/serviceModal";
+import resend from "@/lib/resend";
 
 export const SlotTime = inngest.createFunction(
     {
@@ -80,6 +81,13 @@ export const SlotTime = inngest.createFunction(
                 if (!QueueEntry || !QueueEntry.JoinedQueue) {
                     return { status: false };
                 };
+
+                await resend.emails.send({
+                        from: "Qlessa <onboarding@resend.dev>",
+                        to: "jarvisstark833@gmail.com",
+                        subject: "Testing Resend Acknowledgement",
+                        html: "<p>Your email has been sent successfully!!</p>",
+                    });
                 console.log("Notified through call/SMS and stored in DB");
                 return { status: true }
             });
@@ -104,6 +112,7 @@ export const SlotTime = inngest.createFunction(
                 await step.run('slot-started', async (): Promise<{ status?: string }> => {
                     // For free tier we can intiate the email and for ppaid we can intiate the calling system(for user)
                     console.log("Make a DB query to indicate the slot has started after the slot is over make it success(When the Slot of second user starts)");
+                    
                     return { status: "slot-started" }
                 })
             } else {

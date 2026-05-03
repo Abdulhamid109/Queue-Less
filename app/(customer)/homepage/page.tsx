@@ -74,10 +74,11 @@ const Page = () => {
                 const location = await getLocation();
                 if (!location) {
                     setLocationCheck(false);
+                    return;
                 }
                 setLocationCheck(true);
-                const latitude = location.coords.latitude;
-                const longitude = location.coords.longitude;
+                const latitude = location!.coords.latitude;
+                const longitude = location!.coords.longitude;
                 console.log(latitude, longitude);
 
             } catch (error: any) {

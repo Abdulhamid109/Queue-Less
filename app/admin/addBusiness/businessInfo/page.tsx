@@ -63,8 +63,8 @@ const Page = () => {
                     setLocationGranted(false)
                     return
                 }
-                setLatitude(location.coords.latitude)
-                setLongitude(location.coords.longitude)
+                setLatitude(location.coords.latitude);
+                setLongitude(location.coords.longitude);
                 setLocationGranted(true);
                 setMarkerPos([location.coords.latitude, location.coords.longitude]);
                 const res = await fetch(

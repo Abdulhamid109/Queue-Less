@@ -69,7 +69,7 @@ const Page = () => {
                         <input
                             type="email"
                             placeholder="Enter your company email"
-                            onChange={(e)=>setdata({...data!,email:e.target.value})}
+                            onChange={(e)=>setdata({...data!,email:e.target.value.toLowerCase()})}
                             required
                             className="p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
                         />

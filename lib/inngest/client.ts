@@ -1,5 +1,5 @@
-import {Inngest} from "inngest";
+import { Inngest } from "inngest";
 
 
-export const inngest = new Inngest({id:"Queueless-Automation",});
+export const inngest = new Inngest({ id: "Queueless-Automation", eventKey: process.env.INNGEST_EVENT_KEY, signingKey: process.env.INNGEST_SIGNING_KEY },);
 

@@ -246,4 +246,18 @@ const Page = () => {
   );
 };
 
-export default Page;
+import { Suspense } from "react";
+
+function PageWrapper() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center animate-pulse text-slate-400 text-sm">
+        Loading...
+      </div>
+    }>
+      <Page />
+    </Suspense>
+  );
+}
+
+export default PageWrapper;

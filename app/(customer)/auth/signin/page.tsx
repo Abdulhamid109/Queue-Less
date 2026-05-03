@@ -21,9 +21,9 @@ interface DataFormat {
     email: string;
     password: string;
     CustomerAddress: string;
-    phone:string;
-    latitude?:number;
-    longitude?:number;
+    phone: string;
+    latitude?: number;
+    longitude?: number;
 }
 
 function MapClickHandler({
@@ -62,7 +62,7 @@ const Page = () => {
     const [locationLoading, setLocationLoading] = useState(true) // true = fetching
     const [locationGranted, setLocationGranted] = useState(false)
     const [isClicked, setClicked] = useState<boolean>(false);
-    
+
 
 
     useEffect(() => {
@@ -101,7 +101,7 @@ const Page = () => {
         e.preventDefault();
         setLoading(true);
         try {
-            const payload = {...data!,latitude,longitude}
+            const payload = { ...data!, latitude, longitude }
             const response = await fetch("/api/customer/auth/signin", {
                 method: 'POST',
                 headers: {
@@ -191,7 +191,11 @@ const Page = () => {
             <div className="flex justify-center items-center flex-col gap-3 min-h-screen">
                 <p className="text-lg">Location permission is required to continue.</p>
                 <button
-                    onClick={() => window.location.reload()}
+                    onClick={() => {
+                        if (typeof window !== "undefined") {
+                            window.location.reload();
+                        }
+                    }}
                     className="bg-red-400 hover:bg-red-500 text-white px-4 py-2 rounded-md transition"
                 >
                     Retry
@@ -238,7 +242,7 @@ const Page = () => {
                     </div>
 
                     <div className="flex flex-col gap-1">
-                                                <label className="text-sm text-gray-600">Password</label>
+                        <label className="text-sm text-gray-600">Password</label>
 
                         <input
                             type={isClicked ? "text" : "password"}
@@ -261,35 +265,35 @@ const Page = () => {
                         {data?.password && (
                             <div className="flex justify-between items-center">
                                 <div className="flex flex-col gap-1 text-xs px-1">
-                                <p className={`flex items-center gap-1 ${data.password.length >= 8 ? "text-green-500" : "text-red-400"}`}>
-                                    {data.password.length >= 8 ? "✓" : "✗"} At least 8 characters
-                                </p>
-                                <p className={`flex items-center gap-1 ${/[A-Z]/.test(data.password) ? "text-green-500" : "text-red-400"}`}>
-                                    {/[A-Z]/.test(data.password) ? "✓" : "✗"} At least one uppercase letter
-                                </p>
-                                <p className={`flex items-center gap-1 ${/[0-9]/.test(data.password) ? "text-green-500" : "text-red-400"}`}>
-                                    {/[0-9]/.test(data.password) ? "✓" : "✗"} At least one number
-                                </p>
-                                <p className={`flex items-center gap-1 ${/[^A-Za-z0-9]/.test(data.password) ? "text-green-500" : "text-red-400"}`}>
-                                    {/[^A-Za-z0-9]/.test(data.password) ? "✓" : "✗"} At least one special character
-                                </p>
-                            </div>
-                            <div className="flex justify-between items-center text-xs">
-                        <div className="flex justify-center items-center gap-1">
-                            <input
-                                type="checkbox"
-                                id="showPassword"
-                                checked={isClicked}
-                                onChange={() => setClicked(prev => !prev)}
-                                className="p-1 cursor-pointer"
+                                    <p className={`flex items-center gap-1 ${data.password.length >= 8 ? "text-green-500" : "text-red-400"}`}>
+                                        {data.password.length >= 8 ? "✓" : "✗"} At least 8 characters
+                                    </p>
+                                    <p className={`flex items-center gap-1 ${/[A-Z]/.test(data.password) ? "text-green-500" : "text-red-400"}`}>
+                                        {/[A-Z]/.test(data.password) ? "✓" : "✗"} At least one uppercase letter
+                                    </p>
+                                    <p className={`flex items-center gap-1 ${/[0-9]/.test(data.password) ? "text-green-500" : "text-red-400"}`}>
+                                        {/[0-9]/.test(data.password) ? "✓" : "✗"} At least one number
+                                    </p>
+                                    <p className={`flex items-center gap-1 ${/[^A-Za-z0-9]/.test(data.password) ? "text-green-500" : "text-red-400"}`}>
+                                        {/[^A-Za-z0-9]/.test(data.password) ? "✓" : "✗"} At least one special character
+                                    </p>
+                                </div>
+                                <div className="flex justify-between items-center text-xs">
+                                    <div className="flex justify-center items-center gap-1">
+                                        <input
+                                            type="checkbox"
+                                            id="showPassword"
+                                            checked={isClicked}
+                                            onChange={() => setClicked(prev => !prev)}
+                                            className="p-1 cursor-pointer"
 
-                            />
-                            <label htmlFor="showPassword" className="cursor-pointer">
-                                Show Password
-                            </label>
-                        </div>
+                                        />
+                                        <label htmlFor="showPassword" className="cursor-pointer">
+                                            Show Password
+                                        </label>
+                                    </div>
 
-                    </div>
+                                </div>
                             </div>
                         )}
                     </div>
@@ -307,7 +311,7 @@ const Page = () => {
                     </div>
 
                     {/* adding map */}
-                        <label className="text-sm text-gray-600">Current Address</label>
+                    <label className="text-sm text-gray-600">Current Address</label>
                     <div className="flex items-center gap-2 p-2 border border-blue-300 rounded-md bg-white">
                         <p className="flex-1 text-sm text-gray-500 truncate">
                             {data?.CustomerAddress || "No address selected yet"}
@@ -392,14 +396,14 @@ const Page = () => {
                     </div>
 
                     <button
-                                            disabled={!isPasswordValid(data?.password || '') && loading}
+                        disabled={!isPasswordValid(data?.password || '') && loading}
 
-                                type="submit"
-                                className="mt-2 w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition duration-200"
-                            >
-                                {loading?"loading...":"signup"}
-                            </button>
-                    
+                        type="submit"
+                        className="mt-2 w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition duration-200"
+                    >
+                        {loading ? "loading..." : "signup"}
+                    </button>
+
                 </form>
 
                 <p className="text-center text-sm text-gray-500 mt-6">

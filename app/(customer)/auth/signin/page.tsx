@@ -1,20 +1,15 @@
 "use client"
-import L from "leaflet"
-import "leaflet/dist/leaflet.css"
 import { Dialog, DialogClose, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { getLocation } from "@/helpers/getCurrentLocation";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
-import { MapContainer, Marker, Popup, TileLayer, useMapEvents } from "react-leaflet";
+import dynamic from "next/dynamic";
 
-delete (L.Icon.Default.prototype as any)._getIconUrl
-L.Icon.Default.mergeOptions({
-    iconRetinaUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png",
-    iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
-    shadowUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
-})
+const Map = dynamic(() => import("@/components/Map"), { ssr: false });
+
+
 
 interface DataFormat {
     name: string;
@@ -26,28 +21,7 @@ interface DataFormat {
     longitude?:number;
 }
 
-function MapClickHandler({
-    onLocationSelect,
-}: {
-    onLocationSelect: (lat: number, lng: number, address: string) => void
-}) {
-    useMapEvents({
-        click: async (e) => {
-            const { lat, lng } = e.latlng
-            try {
-                const res = await fetch(
-                    `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
-                )
-                const data = await res.json()
-                const address = data.display_name ?? `${lat.toFixed(5)}, ${lng.toFixed(5)}`
-                onLocationSelect(lat, lng, address)
-            } catch {
-                onLocationSelect(lat, lng, `${lat.toFixed(5)}, ${lng.toFixed(5)}`)
-            }
-        },
-    })
-    return null
-}
+
 
 const Page = () => {
     const [data, setdata] = useState<DataFormat | null>(null);
@@ -350,23 +324,17 @@ const Page = () => {
 
                                 <section className="h-[60vh] w-full rounded-md overflow-hidden">
                                     {latitude && longitude && (
-                                        <MapContainer
-                                            key={`${latitude}-${longitude}`}
-                                            center={[latitude, longitude]}
-                                            zoom={15}
-                                            className="h-full w-full"
-                                        >
-                                            <TileLayer
-                                                attribution="© OpenStreetMap contributors"
-                                                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                                            />
-                                            <MapClickHandler onLocationSelect={handleLocationSelect} />
-                                            {markerPos && (
-                                                <Marker position={markerPos}>
-                                                    <Popup>{data?.CustomerAddress || "Current Location"}</Popup>
-                                                </Marker>
-                                            )}
-                                        </MapContainer>
+                                        <section className="h-[60vh] w-full rounded-md overflow-hidden">
+    {latitude && longitude && (
+        <Map
+            latitude={latitude}
+            longitude={longitude}
+            markerPos={markerPos ?? null}
+            address={data?.CustomerAddress || ""}
+            onLocationSelect={handleLocationSelect}
+        />
+    )}
+</section>
                                     )}
                                 </section>
 

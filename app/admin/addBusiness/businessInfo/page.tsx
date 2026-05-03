@@ -1,10 +1,7 @@
 "use client"
 import Admin_navbar from '@/components/admin_navbar'
 import React, { useEffect, useRef, useState } from 'react'
-import { MapContainer, Marker, Popup, TileLayer, useMapEvents } from 'react-leaflet'
-import "leaflet/dist/leaflet.css"
 import { getLocation } from '@/helpers/getCurrentLocation'
-import L from "leaflet"
 import toast from 'react-hot-toast'
 import {
     Dialog,
@@ -15,13 +12,9 @@ import {
 } from '@/components/ui/dialog'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import dynamic from "next/dynamic";
 
-delete (L.Icon.Default.prototype as any)._getIconUrl
-L.Icon.Default.mergeOptions({
-    iconRetinaUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png",
-    iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
-    shadowUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
-})
+const Map = dynamic(() => import("@/components/Map"), { ssr: false });
 
 interface CompanyDataFormat {
     CompanyName: string
@@ -36,28 +29,7 @@ interface CompanyDataFormat {
     longitude?: number
 }
 
-function MapClickHandler({
-    onLocationSelect,
-}: {
-    onLocationSelect: (lat: number, lng: number, address: string) => void
-}) {
-    useMapEvents({
-        click: async (e) => {
-            const { lat, lng } = e.latlng
-            try {
-                const res = await fetch(
-                    `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
-                )
-                const data = await res.json()
-                const address = data.display_name ?? `${lat.toFixed(5)}, ${lng.toFixed(5)}`
-                onLocationSelect(lat, lng, address)
-            } catch {
-                onLocationSelect(lat, lng, `${lat.toFixed(5)}, ${lng.toFixed(5)}`)
-            }
-        },
-    })
-    return null
-}
+
 
 const Page = () => {
     const [data, setData] = useState<CompanyDataFormat>({
@@ -259,6 +231,7 @@ const Page = () => {
             }
         </div>
     }
+    
 
     return (
         <div className="font-sans min-h-screen bg-gray-50">
@@ -385,23 +358,17 @@ const Page = () => {
 
                                     <section className="h-[60vh] w-full rounded-md overflow-hidden">
                                         {latitude && longitude && (
-                                            <MapContainer
-                                                key={`${latitude}-${longitude}`}
-                                                center={[latitude, longitude]}
-                                                zoom={15}
-                                                className="h-full w-full"
-                                            >
-                                                <TileLayer
-                                                    attribution="© OpenStreetMap contributors"
-                                                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                                                />
-                                                <MapClickHandler onLocationSelect={handleLocationSelect} />
-                                                {markerPos && (
-                                                    <Marker position={markerPos}>
-                                                        <Popup>{data.BusinessAddress || "Current Location"}</Popup>
-                                                    </Marker>
-                                                )}
-                                            </MapContainer>
+                                            <section className="h-[60vh] w-full rounded-md overflow-hidden">
+    {latitude && longitude && (
+        <Map
+            latitude={latitude}
+            longitude={longitude}
+            markerPos={markerPos ?? null}
+            address={data?.BusinessAddress || ""}
+            onLocationSelect={handleLocationSelect}
+        />
+    )}
+</section>
                                         )}
                                     </section>
 

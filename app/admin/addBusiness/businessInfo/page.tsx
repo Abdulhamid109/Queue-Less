@@ -207,7 +207,7 @@ const Page = () => {
             <div className="flex justify-center items-center flex-col gap-3 min-h-screen">
                 <p className="text-lg">Location permission is required to continue.</p>
                 <button
-                    onClick={() => window.location.reload()}
+                    onClick={() => router.refresh()}
                     className="bg-red-400 hover:bg-red-500 text-white px-4 py-2 rounded-md transition"
                 >
                     Retry

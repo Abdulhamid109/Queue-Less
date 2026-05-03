@@ -222,7 +222,7 @@ const Page = () => {
             } else {
                 toast.success("Successfully left the Queue");
                 setWT('');
-                setTimeout(() => { window.location.reload(); }, 500);
+                setTimeout(() => { window.location.reload() }, 500);
             }
         } catch (error) {
             console.error("Error=>", error);

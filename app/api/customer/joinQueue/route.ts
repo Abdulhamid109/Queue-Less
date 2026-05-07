@@ -133,6 +133,8 @@ export async function POST(request: NextRequest) {
             return acc + (ServiceDB.AvgDurationPerCustomer || 0);
         }, 0);
 
+        console.log("Time of People behind me => "+TotalTime)
+        // time in milisseconds
         const expectedSt = new Date(
             Date.now() + TotalTime * 60000
         );
@@ -150,6 +152,7 @@ export async function POST(request: NextRequest) {
             ServiceId: services,
             date: localeDate,
             status: "active",
+            QueueStatus:"pending",//going to indicated the state of the queue
             JoinedQueue: true,
             CurrentPostion: postion,
             UserWaitingTime: TotalTime,

@@ -114,7 +114,7 @@ const ServiceInfo = () => {
         <div>
             <Admin_navbar />
             <p className="text-xl p-4 animate-pulse text-center">
-                Step 02 — Service Information
+                Step 03 — Service Information
             </p>
 
             <section className="p-5 flex flex-col justify-center items-center md:w-full">

@@ -57,7 +57,7 @@ export const SlotTime = inngest.createFunction(
 
                     console.log(`User ${uid} — mins remaining: ${MinsRemaining}`);
 
-                    if (MinsRemaining <= 9) {
+                    if (MinsRemaining <= 15) {
                         return { notify: true };
                     }
 
@@ -83,17 +83,17 @@ export const SlotTime = inngest.createFunction(
                 };
 
                 await resend.emails.send({
-                        from: "Qlessa <onboarding@resend.dev>",
-                        to: "jarvisstark833@gmail.com",
-                        subject: "Testing Resend Acknowledgement",
-                        html: "<p>Your email has been sent successfully!!</p>",
-                    });
+                    from: "Qlessa <onboarding@resend.dev>",
+                    to: "jarvisstark833@gmail.com",
+                    subject: "Testing Resend Acknowledgement",
+                    html: "<p>Your email has been sent successfully!!</p>",
+                });
                 console.log("Notified through call/SMS and stored in DB");
                 return { status: true }
             });
 
             // STEP 3: Wait final 10 mins
-            await step.sleep('final-10min', '1m');
+            await step.sleep('final-10min', '10m');
 
             // step 04: location confirmation
             const isNearby = await step.run('check-location', async () => {
@@ -112,9 +112,40 @@ export const SlotTime = inngest.createFunction(
                 await step.run('slot-started', async (): Promise<{ status?: string }> => {
                     // For free tier we can intiate the email and for ppaid we can intiate the calling system(for user)
                     console.log("Make a DB query to indicate the slot has started after the slot is over make it success(When the Slot of second user starts)");
-                    
+                    // 1.Make the status check as slot started
+                    const queueDb = await queue.findByIdAndUpdate(
+                        queueId,
+                        { QueueStatus: "started", }
+                    );
+
+                    console.log("slot started for the Queue => " + queueDb)
                     return { status: "slot-started" }
-                })
+                });
+
+                // 2.Make sure that status is completed only 
+                // when the user completed its
+                // full time or if the user leaves early ,and goes beyond the 10 meter radius then automatically the slot should be compeleted and (10 mins wait should start for the next user) 
+
+                // we can apply the polling for checking whther the user is beyond the 10 meter radius or the time allocated is over
+
+
+                await step.run('slot-completed', async (): Promise<{ status?: string }> => {
+
+                    const queueDb = await queue.findByIdAndUpdate(
+                        queueId,
+                        { QueueStatus: "completed", }
+                    );
+
+                    // call the next person in the queue and update the estimated watigin time 
+                    // check whther the workers from the queue are free if yes then immediately send the ack
+                    // To get the worker status(there should be the link between worker and customer)
+                    // if the workers are busy then the worker who has started the early that workers time should be displyed to the next person in the queue and accordignly update the estimation
+                    return { status: "slot-completed" }
+
+                });
+
+
+
             } else {
                 // failing the slot
                 console.log("Started with failed slot checking...");
@@ -130,7 +161,6 @@ export const SlotTime = inngest.createFunction(
                     );
 
                     console.log("Entry => " + entry);
-
                     await customer.findByIdAndUpdate(uid, {
                         $pull: {
                             activeQueues: {
@@ -138,9 +168,10 @@ export const SlotTime = inngest.createFunction(
                             }
                         }
                     });
+
                     const failedEntry = await queue.findByIdAndUpdate(
                         queueId,
-                        { status: "failed", JoinedQueue: false },
+                        { QueueStatus: "failed", status: "failed", JoinedQueue: false },
                         { new: true }
                     );
 

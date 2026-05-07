@@ -66,7 +66,7 @@ const Page = () => {
     return (
         <div>
             <Admin_navbar />
-            <p className='text-xl p-4 animate-pulse text-center'>Step 03 - Time Information</p>
+            <p className='text-xl p-4 animate-pulse text-center'>Step 04 - Time Information</p>
             <section className='p-5 flex flex-col justify-center items-center md:w-full '>
                 <form onSubmit={onhandleSubmit} className='backdrop-blur-2xl shadow-xl shadow-black/25 sm:min-w-[70vw] md:min-w-fit p-4 md:w-fit rounded-md bg-gradient-to-l from-gray-100 to-gray-200'>
                     <div className='flex flex-col'>

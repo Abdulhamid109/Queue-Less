@@ -155,7 +155,7 @@ const Page = () => {
                 }
                 console.log("Submitting:", data)
                 toast.success("Business info saved!");
-                router.push("/admin/addBusiness/serviceInfo");
+                router.push("/admin/addBusiness/workerInfo");
             }
 
         } catch (error) {
@@ -223,7 +223,7 @@ const Page = () => {
 
     if (localStorage.getItem("StepOne") === "true") {
         return <div className='relative top-[10vh] flex flex-col min-h-full min-w-full justify-center items-center gap-2 p-2'>
-            <p className='text-xl p-1'>Step One has been Completed : <Link className='hover:underline text-blue-500' href={"/admin/addBusiness/serviceInfo"}>Navigate to Step Two</Link></p>
+            <p className='text-xl p-1'>Step One has been Completed : <Link className='hover:underline text-blue-500' href={"/admin/addBusiness/workerInfo"}>Navigate to Step Two</Link></p>
             {
                 buttonLoadingState ? <button disabled className='rounded-md bg-gray-500 text-white p-1 hover:bg-gray-600'>Deleting....</button>
                     : <button onClick={DeleteBusinessInfoDetails} className='rounded-md bg-red-500 text-white p-1 hover:bg-red-600'>Clear and Delete the Previous Details</button>

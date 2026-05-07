@@ -10,75 +10,111 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog'
 import { useRouter } from 'next/navigation'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
+import { Trash2 } from 'lucide-react'
 
 
 interface WorkerDataFormat {
+    _id?: string;
     workerName: string;
     WorkerEmail: string;
 }
 
-
 const Page = () => {
     const [ready, setReady] = useState(false)
-    const [loading, setLoading] = useState(false)
+    const [loadingNext, setLoadingNext] = useState(false)
+    const [loadingMore, setLoadingMore] = useState(false)
     const [timeState, setTimeState] = useState(3);
     const [data, setData] = useState<WorkerDataFormat>({
         workerName: "",
         WorkerEmail: ""
     });
     const [open, setOpen] = useState(false);
-
+    const [openworker, setOpenworker] = useState(false);
+    const [workerLoader, setWorkerLoader] = useState(false);
+    const [workerData, setWorkerData] = useState<WorkerDataFormat[]>([])
 
     const router = useRouter();
 
     const onhandleSubmit = (e: React.SubmitEvent) => {
         e.preventDefault();
         setOpen(true);
-        
     }
 
-    const getCurrentBusinessWorkers =async()=>{
+    const onhandleWorker = () => {
+        setOpenworker(true);
+    }
+
+    const getCurrentBusinessWorkers = useCallback(async () => {
+        setWorkerLoader(true);
         try {
-            
+            const bid = localStorage.getItem("uid")
+            const response = await fetch(`/api/admin/getWorkers?bid=${bid}`, {
+                headers: { 'Content-Type': 'application/json' },
+                method: 'GET'
+            });
+
+            const result = await response.json();
+            if (!response.ok) {
+                throw new Error(result.error || "Something went wrong");
+            } else {
+                setWorkerData(result.workers);
+            }
         } catch (error) {
-            
+            console.error("Error:", error)
+            if (error instanceof Error) toast.error(error.message)
+        } finally {
+            setWorkerLoader(false);
+        }
+    }, []);
+
+    const deleteWorker = async (id: string) => {
+        try {
+            const response = await fetch(`/api/admin/deleteWorker?id=${id}`, {
+                method: "DELETE"
+            });
+            const result = await response.json();
+            if (!response.ok) {
+                throw new Error(result.error || "Something went wrong!");
+            } else {
+                toast.success("Successfully deleted the worker");
+                setWorkerData(prev => prev.filter((d: WorkerDataFormat) => d._id !== id));
+            }
+        } catch (error) {
+            console.error("Error:", error)
+            if (error instanceof Error) toast.error(error.message)
         }
     }
 
-    const submittingData = async(check:boolean)=>{
-        setLoading(true)
+    const submittingData = async (check: boolean) => {
+        check ? setLoadingNext(true) : setLoadingMore(true);
         try {
             const bid = localStorage.getItem("uid")
-            console.log("Bid value => "+bid)
-            console.log("Data => "+JSON.stringify(data))
-            const response = await fetch(`/api/admin/addWorker?bid=${bid}`,{
-                headers:{'Content-Type':'application/json'},
-                method:'POST',
-                body:JSON.stringify(data)
+            const response = await fetch(`/api/admin/addWorker?bid=${bid}`, {
+                headers: { 'Content-Type': 'application/json' },
+                method: 'POST',
+                body: JSON.stringify(data)
             });
             const result = await response.json();
-            if(!response.ok){
+            if (!response.ok) {
                 throw new Error(result.error || "Something went wrong");
-            }else{
-                if(check){
-                toast.success("Successfully added the worker details and navigating to third step")
-                router.push("/admin/addBusiness/serviceInfo");
-            }else{
-                setOpen(false);
+            } else {
+                if (check) {
+                    toast.success("Successfully added the worker details and navigating to third step")
+                    router.push("/admin/addBusiness/serviceInfo");
+                } else {
+                    setOpen(false);
                     toast.success("Successfully added the worker details");
-                    setData({
-                        WorkerEmail:"",
-                        workerName:""
-                    })
+                    setData({ WorkerEmail: "", workerName: "" });
+                    getCurrentBusinessWorkers(); 
                 }
             }
         } catch (error) {
             console.error("Error:", error)
             if (error instanceof Error) toast.error(error.message)
-        }finally{
-            setLoading(false);
+        } finally {
+            check ? setLoadingNext(false) : setLoadingMore(false);
         }
     }
 
@@ -87,20 +123,19 @@ const Page = () => {
         setData((prev) => ({ ...prev, [name]: value }))
     }
 
-
     const handleAddWorker = () => {
         if (!data.workerName.trim() || !data.WorkerEmail.trim()) {
             toast.error("Please fill in all fields before adding a worker.");
             return;
         }
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
         if (!emailRegex.test(data.WorkerEmail)) {
             toast.error("Invalid email format");
             return;
         }
         setOpen(true);
     };
+
     useEffect(() => {
         if (ready) return
         const interval = setTimeout(() => {
@@ -116,9 +151,12 @@ const Page = () => {
 
     useEffect(() => {
         const Callingfunction = () => { setReady(localStorage.getItem("StepOne") === "true") }
-
         Callingfunction();
     }, [])
+
+    useEffect(() => {
+        getCurrentBusinessWorkers();
+    }, [getCurrentBusinessWorkers])
 
     if (!ready) {
         return (
@@ -131,7 +169,6 @@ const Page = () => {
         )
     }
 
-    // i need to store it as the second step where the user can delete it if he wants
     return (
         <div>
             <Admin_navbar />
@@ -139,7 +176,9 @@ const Page = () => {
                 Step 02 — Workers Information
             </p>
 
-            <p className='text-xs font-bold animate-pulse text-center'>Note : Based on the email provided workers have to login at the start of the day</p>
+            <p className='text-xs font-bold animate-pulse text-center'>
+                Note : Based on the email provided workers have to login at the start of the day
+            </p>
 
             <section className="p-5 flex flex-col justify-center items-center md:w-full">
                 <form
@@ -173,18 +212,33 @@ const Page = () => {
                     </div>
 
                     <button
+                        type="button"
                         onClick={handleAddWorker}
                         className="bg-blue-500 hover:bg-blue-600 disabled:opacity-60 p-2 mt-4 rounded-md text-white w-full transition"
                     >
                         Add Worker
                     </button>
-                    <Dialog open={open} onOpenChange={setOpen} >
 
-                        <DialogContent >
+                    <Dialog open={open} onOpenChange={setOpen}>
+                        <DialogContent>
+                            <DialogTitle>Worker Added</DialogTitle>
+                            <DialogDescription>
+                                What would you like to do next?
+                            </DialogDescription>
                             <DialogFooter>
                                 <div className='flex justify-around items-center p-2 min-w-full'>
-                                    <Button onClick={()=>submittingData(true)}>Navigate to next step</Button>
-                                    <Button onClick={()=>submittingData(false)}>{loading?"Submitting":"Add more workers"}</Button>
+                                    <Button
+                                        onClick={() => submittingData(true)}
+                                        disabled={loadingNext || loadingMore}
+                                    >
+                                        {loadingNext ? "Submitting..." : "Navigate to next step"}
+                                    </Button>
+                                    <Button
+                                        onClick={() => submittingData(false)}
+                                        disabled={loadingMore || loadingNext}
+                                    >
+                                        {loadingMore ? "Submitting..." : "Add more workers"}
+                                    </Button>
                                 </div>
                             </DialogFooter>
                         </DialogContent>
@@ -192,6 +246,48 @@ const Page = () => {
                 </form>
             </section>
 
+            {
+                workerData.length >= 1 && (
+                    <button
+                        onClick={onhandleWorker}
+                        className='flex justify-center items-center min-w-full'>
+                        See Workers
+                    </button>
+                )
+            }
+
+            {workerData && (
+                workerLoader
+                    ? <div className="animate-pulse text-center">Loading workers Data</div>
+                    : <div className='min-w-full'>
+                        <Dialog open={openworker} onOpenChange={setOpenworker}>
+                            {/* <DialogTrigger>
+                                
+                            </DialogTrigger> */}
+                            <DialogContent showCloseButton={false}>
+                                <DialogTitle className='text-center'>
+                                    All Workers associated with the business
+                                </DialogTitle>
+                                <DialogDescription>
+                                    {workerData.map((d: WorkerDataFormat) => (
+                                        <div
+                                            key={d._id}
+                                            className="bg-black/10 p-2 m-2 rounded-md flex justify-around  items-center"
+                                        >
+                                            <div>
+                                                <p>Worker Name : {d.workerName}</p>
+                                                <p>Worker Email : {d.WorkerEmail}</p>
+                                            </div>
+                                            <button className='p-1 rounded-full hover:bg-black/20 cursor-pointer' onClick={() => deleteWorker(d._id!)}>
+                                                <Trash2 />
+                                            </button>
+                                        </div>
+                                    ))}
+                                </DialogDescription>
+                            </DialogContent>
+                        </Dialog>
+                    </div>
+            )}
         </div>
     )
 }

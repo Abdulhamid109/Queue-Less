@@ -6,6 +6,7 @@ import customer from "@/models/CustomerModal";
 import service from "@/models/serviceModal";
 import { inngest } from "@/lib/inngest/client";
 import BusinessTime from "@/models/TimeModal";
+import worker from "@/models/workermodal";
 
 
 connect();
@@ -144,6 +145,20 @@ export async function POST(request: NextRequest) {
 
         console.log("Estimated Waiting Time (in mins) => " + TotalTime);
         console.log("Expected Start Time (in mins) => " + expectedSt);
+
+        // before joining the queue we need to find the no workers active or inactive then accordingly allocate the time
+        const workerStatus = await worker.findOne({businessId:businessId,WorkStatus:'inactive'});
+
+        if(workerStatus){
+            // we are gonna make him active and give the access to the user the ewt => 10 mins
+
+        }else{
+            // we are gonna set that user in the queue
+            // Total number workers present in the business and there accesess with uids assocautes
+            // we are gonna find that worker who has started the service early and the service time of the user
+        }
+
+
 
 
         const newQueueJoinee = new queue({

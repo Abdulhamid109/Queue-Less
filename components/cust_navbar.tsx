@@ -23,7 +23,7 @@ const Cust_navbar = () => {
       }
 
       toast.success("Successfully logged out!")
-      router.push("/auth/login")
+      router.push("/auth/Get Started")
     } catch (error) {
       console.log("Failed to logout", error)
     }
@@ -77,10 +77,10 @@ const Cust_navbar = () => {
           </button>
         ) : (
           <Link
-            href="/auth/login"
+            href="/QR"
             className="text-sm font-medium bg-gray-900 text-white px-4 py-1.5 rounded-lg hover:bg-gray-700 transition-colors"
           >
-            Login
+            Get Started
           </Link>
         )}
       </div>
@@ -130,11 +130,11 @@ const Cust_navbar = () => {
             </button>
           ) : (
             <Link
-              href="/auth/login"
+              href="/QR"
               onClick={() => setMenuOpen(false)}
               className="w-full text-sm font-medium text-center bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
             >
-              Login
+              Get Started
             </Link>
           )}
         </div>

@@ -14,7 +14,7 @@ const Page = () => {
         <div className='pt-4'>
         
     <SVG
-      text={'https://github.com/Abdulhamid109/Queue-Less/releases/download/queueless-apk/queueless.apk'}
+      text={'https://github.com/Abdulhamid109/Queue-Less/releases/download/queueless-apk-v1.0.8/app-arm64-v8a-release.apk'}
       options={{
         margin: 2,
         width: 300,

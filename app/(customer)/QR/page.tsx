@@ -14,7 +14,7 @@ const Page = () => {
         <div className='pt-4'>
         
     <SVG
-      text={'https://github.com/Abdulhamid109/Queue-Less/releases/download/queueless-apk-2.0.1/app-release.apk'}
+      text={'https://github.com/Abdulhamid109/Queue-Less/releases/download/queueless-apk-v2.5.0/app-release.apk'}
       options={{
         margin: 2,
         width: 300,
@@ -27,7 +27,7 @@ const Page = () => {
       </div>
       or
       <a
-        href='https://github.com/Abdulhamid109/Queue-Less/releases/download/queueless-apk-2.0.1/app-release.apk'
+        href='https://github.com/Abdulhamid109/Queue-Less/releases/download/queueless-apk-v2.5.0/app-release.apk'
         download={true}
        className='bg-blue-500 rounded-md p-2'>
         Download from here

@@ -66,9 +66,9 @@ const Cust_navbar = () => {
           </Link>
         ))}
 
-        <div className="w-px h-4 bg-gray-200 mx-2" />
+        {/* <div className="w-px h-4 bg-gray-200 mx-2" /> */}
 
-        {session ? (
+        {/* {session ? (
           <button
             onClick={handleLogout}
             className="text-sm text-red-500 hover:text-red-600 px-3 py-1.5 rounded-md hover:bg-red-50 transition-colors"
@@ -82,7 +82,7 @@ const Cust_navbar = () => {
           >
             Get Started
           </Link>
-        )}
+        )} */}
       </div>
 
       {/* Mobile Toggle */}
@@ -119,7 +119,7 @@ const Cust_navbar = () => {
             </Link>
           ))}
 
-          <div className="w-full h-px bg-gray-100 my-1" />
+          {/* <div className="w-full h-px bg-gray-100 my-1" /> */}
 
           {/* {session ? (
             <button

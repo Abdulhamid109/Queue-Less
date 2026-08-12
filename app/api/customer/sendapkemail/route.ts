@@ -17,20 +17,30 @@ export async function POST(request:NextRequest){
         }
 
         const { data, error } = await resend.emails.send({
-        from: "Queueless <info@queueless.fun>",
-        to: waitlistemail,
-        subject: "Thank-You for joining our waitlist",
-        text: `You have joined our product waitlist with ${waitlistemail}`,
-        html: `
-        <div style="font-family: sans-serif; padding: 20px;">
-            <h2>Queueless early access</h2>
-            <a href=${'https://github.com/Abdulhamid109/Queue-Less/releases/download/queueless-apk-v2.5.0/app-release.apk'} style="font-size: 17px; color: blue;">Click Here!</a>
-            <p>© ${new Date().getFullYear()} Queueless. All rights reserved</p>
-            <hr/>
-            <p style="font-size: 12px; color: #888;">Queueless · info@queueless.fun</p>
-        </div>
-    `
-    });
+  from: "Queueless <info@queueless.fun>",
+  to: waitlistemail,
+  subject: "You're on the Queueless waitlist",
+  text: `Hi,
+
+Thanks for signing up for Queueless early access using ${waitlistemail}.
+
+Download the app here: https://github.com/Abdulhamid109/Queue-Less/releases/download/queueless-apk-v2.5.0/app-release.apk
+
+If you didn't request this, you can ignore this email.
+
+— The Queueless Team`,
+  html: `
+    <div style="font-family: Arial, sans-serif; font-size: 14px; color: #222; line-height: 1.5; max-width: 480px;">
+      <p>Hi,</p>
+      <p>Thanks for signing up for Queueless early access using <strong>${waitlistemail}</strong>.</p>
+      <p>You can download the app here: <a href="https://github.com/Abdulhamid109/Queue-Less/releases/download/queueless-apk-v2.5.0/app-release.apk">Download Queueless APK</a></p>
+      <p>If you didn't request this, you can safely ignore this email.</p>
+      <p>— The Queueless Team</p>
+      <hr style="border:none;border-top:1px solid #eee;margin:20px 0;">
+      <p style="font-size: 12px; color: #888;">Queueless · info@queueless.fun</p>
+    </div>
+  `
+});
 
     if (error) {
         console.log("Error => " + JSON.stringify(error));

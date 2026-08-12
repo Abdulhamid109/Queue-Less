@@ -52,7 +52,7 @@ const Waitlistpage = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center px-6 bg-[#F9FAF9] text-center">
+    <div id='waitlist' className="min-h-screen flex flex-col justify-center items-center px-6 bg-[#F9FAF9] text-center">
       <span
         className="inline-block text-xs font-semibold tracking-widest uppercase px-3 py-1 rounded-full mb-6"
         style={{ backgroundColor: lightGreen, color: primaryGreen }}

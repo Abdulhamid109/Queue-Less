@@ -121,7 +121,7 @@ const Cust_navbar = () => {
 
           <div className="w-full h-px bg-gray-100 my-1" />
 
-          {session ? (
+          {/* {session ? (
             <button
               onClick={() => { handleLogout(); setMenuOpen(false) }}
               className="w-full text-left text-sm text-red-500 px-3 py-2 rounded-md hover:bg-red-50 transition-colors"
@@ -136,7 +136,7 @@ const Cust_navbar = () => {
             >
               Get Started
             </Link>
-          )}
+          )} */}
         </div>
       )}
     </nav>

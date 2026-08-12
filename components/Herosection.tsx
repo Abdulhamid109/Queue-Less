@@ -26,13 +26,13 @@ const Herosection = () => {
           href='/auth/login'
           className='bg-gray-900 text-white text-sm font-medium px-6 py-2.5 rounded-lg hover:bg-gray-700 transition-colors duration-200'
         >
-          Get Started
+          Join Now!
         </Link> */}
         <Link
-          href='/QR'
+          href='#waitlist'
           className='bg-gray-900 text-white text-sm font-medium px-6 py-2.5 rounded-lg hover:bg-gray-700 transition-colors duration-200'
         >
-          Get Started
+          Join Now
         </Link>
         <Link
           href='/aboutus'

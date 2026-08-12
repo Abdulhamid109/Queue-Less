@@ -13,7 +13,7 @@ const Waitlistpage = () => {
 
   const isValidEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault()
 
     if (!email.trim()) {
@@ -33,13 +33,12 @@ const Waitlistpage = () => {
 
     try {
       // TODO: replace with your actual waitlist endpoint
-      // const res = await fetch(`${BaseUrl}/waitlist/join`, {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ email }),
-      // })
-      // if (!res.ok) throw new Error('Failed to join waitlist')
-
+      const res = await fetch(`/api/customer/sendapkemail`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ "waitlistemail":email }),
+      })
+      if (!res.ok) throw new Error('Failed to join waitlist')
       await new Promise((resolve) => setTimeout(resolve, 800)) // placeholder delay
 
       setStatus('success')

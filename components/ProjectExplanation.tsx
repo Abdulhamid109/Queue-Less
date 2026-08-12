@@ -7,13 +7,12 @@ const ProjectExplanation = () => {
     const secondaryText = '#5C5C5C'
 
     const videoUrl =
-        'https://ik.imagekit.io/abdulhamid109/Queueless-media/No%20More%20Waiting%20Queues%20.mp4?updatedAt=1786540749624'
+        'https://ik.imagekit.io/abdulhamid109/Queueless-media/No%20More%20Waiting%20Queues.mp4'
 
     return (
         <section className="min-h-screen flex items-center bg-[#F9FAF9] px-6 md:px-16 py-20">
             <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-14 items-center w-full">
 
-                {/* ================= LEFT — EXPLANATION ================= */}
                 <div className="text-left">
                     <span
                         className="inline-block text-xs font-semibold tracking-widest uppercase px-3 py-1 rounded-full mb-6"

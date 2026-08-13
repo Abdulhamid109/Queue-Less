@@ -24,7 +24,7 @@ export async function POST(request:NextRequest){
 
 Thanks for signing up for Queueless early access using ${waitlistemail}.
 
-Download the app here: https://github.com/Abdulhamid109/Queue-Less/releases/download/queueless-apk-v2.5.0/app-release.apk
+Download the app here: https://github.com/Abdulhamid109/Queue-Less/releases/download/queueless-apk-v3.0.0/app-release.apk
 
 If you didn't request this, you can ignore this email.
 

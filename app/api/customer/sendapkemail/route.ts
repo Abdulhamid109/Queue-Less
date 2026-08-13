@@ -33,7 +33,7 @@ If you didn't request this, you can ignore this email.
     <div style="font-family: Arial, sans-serif; font-size: 14px; color: #222; line-height: 1.5; max-width: 480px;">
       <p>Hi,</p>
       <p>Thanks for signing up for Queueless early access using <strong>${waitlistemail}</strong>.</p>
-      <p>You can download the app here: <a href="https://github.com/Abdulhamid109/Queue-Less/releases/download/queueless-apk-v2.5.0/app-release.apk">Download Queueless APK</a></p>
+      <p>You can download the app here: <a href="https://github.com/Abdulhamid109/Queue-Less/releases/download/queueless-apk-v3.0.0/app-release.apk">Download Queueless APK</a></p>
       <p>If you didn't request this, you can safely ignore this email.</p>
       <p>— The Queueless Team</p>
       <hr style="border:none;border-top:1px solid #eee;margin:20px 0;">
